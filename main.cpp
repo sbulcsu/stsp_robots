@@ -18,6 +18,7 @@
 using namespace lpzrobots;
 using namespace std;
 
+//just a comment to check how one merges two branches
 
 class ThisSim : public Simulation {
 public:
