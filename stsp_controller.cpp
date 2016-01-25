@@ -35,7 +35,7 @@
 using namespace std;
 using namespace lpzrobots;
 
-STPCoupling::STPCoupling(const OdeConfig& odeconfig, double roboterdiameter)
+STSPController::STSPController(const OdeConfig& odeconfig, double roboterdiameter)
   : AbstractController("STPController", "1.0"), odeconfig(odeconfig)
   {
    robotdiameter = roboterdiameter;
@@ -44,7 +44,7 @@ STPCoupling::STPCoupling(const OdeConfig& odeconfig, double roboterdiameter)
    number_motors = 0;
 };
 
-void STPCoupling::init(int sensornumber, int motornumber, RandGen* randGen){
+void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
      number_sensors = sensornumber;
      number_motors = motornumber;
      cout<< " Number of motors: "  << number_motors << endl;
@@ -93,7 +93,7 @@ void STPCoupling::init(int sensornumber, int motornumber, RandGen* randGen){
 
 };
 
-void STPCoupling::step(const sensor* sensors, int sensornumber,
+void STSPController::step(const sensor* sensors, int sensornumber,
                           motor* motors, int motornumber) {
     stepsize = odeconfig.simStepSize*odeconfig.controlInterval;
 
@@ -132,21 +132,21 @@ void STPCoupling::step(const sensor* sensors, int sensornumber,
 
 };
 
-double STPCoupling::y(double x){
+double STSPController::y(double x){
 		return 1. / (1. +exp(a*(b-x)));
 };
 
-double STPCoupling::U(double y){
+double STSPController::U(double y){
        return  1.+ (U_max- 1.)* y;
 };
 
-double STPCoupling::PHI(double y, double u){
+double STSPController::PHI(double y, double u){
        return  1.- (u* y)/ U_max;
 };
 
 
 
-void STPCoupling::stepNoLearning(const sensor* sensors, int number_sensors,
+void STSPController::stepNoLearning(const sensor* sensors, int number_sensors,
                                     motor* motors, int number_motors) {
 
 };
