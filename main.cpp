@@ -52,7 +52,7 @@ public:
     setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
 
     /********** ROBOTS *********/
-    BarrelRobot conf = BarrelRobot::getDefaultConf();
+    BarrelRobotConf  conf = BarrelRobot::getDefaultConf();
     conf.diameter = 2.0;
     conf.pendularrange  = 0.5;  // 0.5 entspricht der Hülle
     conf.spheremass   = 1;
