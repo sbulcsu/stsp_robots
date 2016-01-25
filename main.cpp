@@ -52,7 +52,7 @@ public:
     setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
 
     /********** ROBOTS *********/
-    Barrel2MassesSimpConf conf = Barrel2MassesSimp::getDefaultConf();
+    BarrelRobot conf = BarrelRobot::getDefaultConf();
     conf.diameter = 2.0;
     conf.pendularrange  = 0.5;  // 0.5 entspricht der Hülle
     conf.spheremass   = 1;
@@ -61,7 +61,7 @@ public:
     conf.axesShift = 0;
     conf.motorsensor=true;           
     //conf.addSensor(new AxisOrientationSensor(AxisOrientationSensor::ZProjection, Sensor::X |Sensor::Y));
-    barrel = new Barrel2MassesSimp(odeHandle, osgHandle.changeColor(Color(0.0,0.0,1.0)),
+    barrel = new BarrelRobot(odeHandle, osgHandle.changeColor(Color(0.0,0.0,1.0)),
                                    conf, "Barrel", 0.4, 2); 
     barrel->place (osg::Matrix::rotate(M_PI/2, 1,0,0)*osg::Matrix::translate(0,0,0.3)); //0.2
 
@@ -72,7 +72,7 @@ public:
     modus = SpeedSensor::Rotational; 
     barrel->addSensor(std::make_shared<SpeedSensor>(1,SpeedSensor::Rotational),Attachment(-1));
 
-    controller = new STPCoupling(global.odeConfig, conf.diameter);
+    controller = new STSPController(global.odeConfig, conf.diameter);
     One2OneWiring* wiring = new One2OneWiring ( new ColorUniformNoise(0.1) );
     OdeAgent* agent = new OdeAgent ( globalData );
     agent->init ( controller , barrel , wiring );
