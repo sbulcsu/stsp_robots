@@ -5,11 +5,11 @@
 
 #include <ode_robots/odeconfig.h>
 
-class STPCoupling : public AbstractController {
+class STSPController : public AbstractController {
 public:
 
 
-  STPCoupling(const lpzrobots::OdeConfig& odeconfig, double robotdiameter);
+  STSPController(const lpzrobots::OdeConfig& odeconfig, double robotdiameter);
 
   virtual void init(int sensornumber, int motornumber, RandGen* randGen = 0);
 
