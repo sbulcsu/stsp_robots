@@ -13,17 +13,17 @@ using namespace std;
 namespace lpzrobots {
 
 
-void Barrel2MassesSimpConf::destroy(){
+void BarrelRobotConf::destroy(){
      for(list<Sensor*>::iterator i = sensors.begin(); i != sensors.end(); i++){
        if(*i) delete *i;
      }
      sensors.clear();
 };
 
-//const int Barrel2MassesSimp::servono;
+//const int BarrelRobot::servono;
 
-Barrel2MassesSimp::Barrel2MassesSimp ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
-                               const Barrel2MassesSimpConf& conf,const std::string& name,
+BarrelRobot::BarrelRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
+                               const BarrelRobotConf& conf,const std::string& name,
                                double transparency, int axes_number)
     : OdeRobot( odeHandle, osgHandle, name, "$Id$"),  conf(conf), transparency(transparency){
        numberaxis= axes_number;
@@ -31,16 +31,16 @@ Barrel2MassesSimp::Barrel2MassesSimp ( const OdeHandle& odeHandle, const OsgHand
 };
 
 
-Barrel2MassesSimp::~Barrel2MassesSimp(){ 
+BarrelRobot::~BarrelRobot(){ 
       destroy();
-      if(conf.irSensorTempl) delete conf.irSensorTempl; // ersetzen durch Barrel2MassesSimpConf::destroy???
+      if(conf.irSensorTempl) delete conf.irSensorTempl; // ersetzen durch BarrelRobotConf::destroy???
       FOREACH(std::list<Sensor*>, conf.sensors, s){     // c.destroy() 
         if(*s) delete *s;
       }
 };
 
 
-void Barrel2MassesSimp::update(){    //   update of primitives and osgprimitives
+void BarrelRobot::update(){    //   update of primitives and osgprimitives
      for (int i=0; i < Last; i++) {
        if(objects[i]) objects[i]->update();
      }
@@ -66,7 +66,7 @@ void Barrel2MassesSimp::update(){    //   update of primitives and osgprimitives
  *@param sensornumber length of the sensor array
  *@return number of actually written sensors
  **/
-int Barrel2MassesSimp::getSensorsIntern( sensor* sensors, int sensornumber ){
+int BarrelRobot::getSensorsIntern( sensor* sensors, int sensornumber ){
      int len=0;
      assert(created);
      if(!conf.motor_ir_before_sensors){
@@ -94,7 +94,7 @@ int Barrel2MassesSimp::getSensorsIntern( sensor* sensors, int sensornumber ){
 
 
 
-void Barrel2MassesSimp::setMotorsIntern( const double* motors, int motornumber ) {
+void BarrelRobot::setMotorsIntern( const double* motors, int motornumber ) {
   int len = min((unsigned)motornumber, numberaxis);
   for ( int n = 0; n < len; n++ ) {
     servo[n]->set(motors[n]);
@@ -104,13 +104,13 @@ void Barrel2MassesSimp::setMotorsIntern( const double* motors, int motornumber )
 
 //**************** wird jedes mal aufgerufen
 //cout << " getMotorNumberIntern wurde aufgerufen" << endl;
-int Barrel2MassesSimp::getMotorNumberIntern(){
+int BarrelRobot::getMotorNumberIntern(){
   return numberaxis;
 };
 
 //**************** wird fast nie aufgerufen
 //cout << "             getSensorNumberIntern wurde aufgerufen" << endl;
-int Barrel2MassesSimp::getSensorNumberIntern() {
+int BarrelRobot::getSensorNumberIntern() {
   int s=0;
   FOREACHC(list<Sensor*>, conf.sensors, i){
     s += (*i)->getSensorNumber();
@@ -119,21 +119,21 @@ int Barrel2MassesSimp::getSensorNumberIntern() {
 };
 
 
-void Barrel2MassesSimp::placeIntern(const osg::Matrix& pose){
+void BarrelRobot::placeIntern(const osg::Matrix& pose){
   osg::Matrix p2;
   p2 = pose * osg::Matrix::translate(osg::Vec3(0, 0, conf.diameter/2));
   create(p2);
 };
 
 
-void Barrel2MassesSimp::sense(GlobalData& globalData) {
+void BarrelRobot::sense(GlobalData& globalData) {
   // reset ir sensors to maximum value
   irSensorBank.sense(globalData);
   OdeRobot::sense(globalData);
 };
 
 
-void Barrel2MassesSimp::doInternalStuff(GlobalData& global){
+void BarrelRobot::doInternalStuff(GlobalData& global){
      OdeRobot::doInternalStuff(global);
      //// slow down rotation around z axis because friction does not catch it.
      //dBodyID b = getMainPrimitive()->getBody();
@@ -152,7 +152,7 @@ void Barrel2MassesSimp::doInternalStuff(GlobalData& global){
 };
 
 
-void Barrel2MassesSimp::notifyOnChange(const paramkey& key){
+void BarrelRobot::notifyOnChange(const paramkey& key){
      if(key == "motorpower" || key == "pendularmass"){
 	for(unsigned int i=0; i<numberaxis; i++){
 	    servo[i]->setPower(conf.pendularmass*conf.motorpowerfactor);
@@ -175,7 +175,7 @@ void Barrel2MassesSimp::notifyOnChange(const paramkey& key){
 
 
 /** creates vehicle at desired position and orientation */
-void Barrel2MassesSimp::create(const osg::Matrix& pose){
+void BarrelRobot::create(const osg::Matrix& pose){
      if (created){  destroy(); }
    
      // create vehicle space and add it to the top level space
@@ -270,7 +270,7 @@ void Barrel2MassesSimp::create(const osg::Matrix& pose){
 };
 
 
-void Barrel2MassesSimp::init(){
+void BarrelRobot::init(){
      created = false;
      objects.resize(Last); //hier werden die größen der Listen festgelegt
      joints.resize(2*servono);
@@ -283,7 +283,7 @@ void Barrel2MassesSimp::init(){
 };
 
 
-void Barrel2MassesSimp::destroy(){   /** destroys vehicle and space */
+void BarrelRobot::destroy(){   /** destroys vehicle and space */
   if (created){
     for (int i=0; i<servono; i++){
       if(servo[i]) delete servo[i];

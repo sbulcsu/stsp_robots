@@ -37,20 +37,20 @@ public:
      std::list<Sensor*> sensors;
      /// adds a sensor to the list of sensors
      void addSensor(Sensor* s) { sensors.push_back(s); }
-} Barrel2MassesSimpConf;
+} BarrelRobotConf;
 
 
-class Barrel2MassesSimp : public OdeRobot
+class BarrelRobot : public OdeRobot
 {
    public:
 
-     Barrel2MassesSimp ( const OdeHandle& odeHandle, const OsgHandle& osgHandle, const Barrel2MassesSimpConf& conf,
+     BarrelRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle, const BarrelRobotConf& conf,
                      const std::string& name, double transparency=0.5, int axes_number=2 );
    
-     virtual ~Barrel2MassesSimp();
+     virtual ~BarrelRobot();
 
-     static Barrel2MassesSimpConf getDefaultConf(){ // default configuration
-       Barrel2MassesSimpConf c;
+     static BarrelRobotConf getDefaultConf(){ // default configuration
+       BarrelRobotConf c;
        c.diameter     = 2.;
        c.spheremass   = 100.;// 0.1
        c.pendularmass  = 1.0;
@@ -105,13 +105,13 @@ class Barrel2MassesSimp : public OdeRobot
      OSGPrimitive* axis[servono];
      OSGPrimitive* axisdots[servono];
    
-     Barrel2MassesSimpConf conf;
+     BarrelRobotConf conf;
      RaySensorBank irSensorBank;   //< a collection of ir sensors
      double transparency;
      bool created;
 
-    // Barrel2MassesSimp ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
-    //                 const Barrel2MassesSimpConf& conf, const std::string& name,
+    // BarrelRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
+    //                 const BarrelRobotConf& conf, const std::string& name,
     //                 const std::string& revision, double transparency);
    
 };
