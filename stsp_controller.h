@@ -8,7 +8,7 @@
 class STPCoupling : public AbstractController {
 public:
 
-
+#Here should be a change!!!
   STPCoupling(const lpzrobots::OdeConfig& odeconfig, double robotdiameter);
 
   virtual void init(int sensornumber, int motornumber, RandGen* randGen = 0);
