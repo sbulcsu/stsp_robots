@@ -35,11 +35,9 @@
 using namespace std;
 using namespace lpzrobots;
 
-STSPController::STSPController(const OdeConfig& odeconfig, double roboterdiameter)
+STSPController::STSPController(const OdeConfig& odeconfig )
   : AbstractController("STPController", "1.0"), odeconfig(odeconfig)
   {
-   robotdiameter = roboterdiameter;
-   cout<< " Robot's diameter:" << robotdiameter<< endl;
    number_sensors = 0;
    number_motors = 0;
 };
@@ -108,17 +106,17 @@ void STSPController::step(const sensor* sensors, int sensornumber,
 
 
     x0_new = x0_old + (- gamma* x0_old 
-                       + w_0* ( (sensor0/(r* robotdiameter))+ 0.5 )
+                       + w_0* ( (sensor0/r)+ 0.5 )
                        + z_0* u1_old * phi1_old* y1_old )*  stepsize; 
 
     x1_new = x1_old + (- gamma* x1_old 
-                       + w_0* ( (sensor1/(r* robotdiameter))+ 0.5 )
+                       + w_0* ( (sensor1/r)+ 0.5 )
                        + z_0* u0_old * phi0_old* y0_old )*  stepsize; 
     y0_new = y(x0_new);
     y1_new = y(x1_new);
 
-    motors[0] =  robotdiameter* r*  (y0_new- 0.5);
-    motors[1] =  robotdiameter* r* (y1_new- 0.5);
+    motors[0] =  r* (y0_new- 0.5);
+    motors[1] =  r* (y1_new- 0.5);
 
 
     /*** rewriting for next timestep ***/

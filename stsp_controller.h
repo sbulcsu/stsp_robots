@@ -9,7 +9,7 @@ class STSPController : public AbstractController {
 public:
 
 
-  STSPController(const lpzrobots::OdeConfig& odeconfig, double robotdiameter);
+  STSPController(const lpzrobots::OdeConfig& odeconfig );
 
   virtual void init(int sensornumber, int motornumber, RandGen* randGen = 0);
 
@@ -48,10 +48,7 @@ protected:
   std::string name;
   double a; 
   double b;
-  double robotdiameter;
-  //double r;
   double stepsize; 
-  //double targetpos;
 
   int number_sensors;
   int number_motors;
