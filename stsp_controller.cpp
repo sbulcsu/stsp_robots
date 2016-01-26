@@ -106,19 +106,18 @@ void STSPController::step(const sensor* sensors, int sensornumber,
 
 
     x0_new = x0_old + (- gamma* x0_old 
-                       + w_0* ( (sensor0/r)+ 0.5 )
+                       + w_0* ( (sensor0/(r*2))+ 0.5 )
                        + z_0* u1_old * phi1_old* y1_old )*  stepsize; 
 
     x1_new = x1_old + (- gamma* x1_old 
-                       + w_0* ( (sensor1/r)+ 0.5 )
+                       + w_0* ( (sensor1/(r*2))+ 0.5 )
                        + z_0* u0_old * phi0_old* y0_old )*  stepsize; 
     y0_new = y(x0_new);
     y1_new = y(x1_new);
 
-    motors[0] =  r* (y0_new- 0.5);
-    motors[1] =  r* (y1_new- 0.5);
+    motors[0] =  r* 2* (y0_new- 0.5);
+    motors[1] =  r* 2* (y1_new- 0.5);
 
-cout << "("<<  motors[0]<< ","<< motors[1]<< ")     " << "("<<  sensors[0]<< ","<< sensors[1]<< ")     " << endl;
 
     /*** rewriting for next timestep ***/
     y0_old = y0_new;
