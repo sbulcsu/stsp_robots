@@ -66,14 +66,14 @@ void STSPController::step(const sensor* sensors, int sensornumber,
          		     *stepsize; 
          neuron[i].x_new   = neuron[i].x_old + 
          		     (- gamma* neuron[i].x_old 
-                             + w_0* ((neuron[i].sensor/(r*2))+ 0.5 ))   // durch funktion ersetzen
+                             + w_0* scalingPos( neuron[i].sensor ))   // durch funktion ersetzen
          		     *stepsize;
          for(int j=0; j<number_motors; j++){
              if(i==j) continue;
              neuron[i].x_new += (z_0* neuron[j].u_old* neuron[j].phi_old* neuron[j].y_old)* stepsize;
          }
          neuron[i].y_new    = y( neuron[i].x_new );
-         motors[i]          = r* 2* (neuron[i].y_new - 0.5);
+         motors[i]          = target( neuron[i].y_new );
      }
      
      /*** rewriting for next timestep ***/
@@ -86,7 +86,7 @@ void STSPController::step(const sensor* sensors, int sensornumber,
 };
 
 double STSPController::y(double x){
-		return 1. / (1. +exp(a*(b-x)));
+       return 1. / (1. +exp(a*(b-x)));
 };
 
 double STSPController::U(double y){
@@ -97,7 +97,13 @@ double STSPController::PHI(double y, double u){
        return  1.- (u* y)/ U_max;
 };
 
+double STSPController::target(double y){
+       return r* ( 2*y - 1);
+};
 
+double STSPController::scalingPos(double sensor){
+       return sensor/(r*2) + 0.5 ;
+};
 
 void STSPController::stepNoLearning(const sensor* sensors, int number_sensors,
                                     motor* motors, int number_motors) {
