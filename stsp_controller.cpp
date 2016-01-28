@@ -58,7 +58,7 @@ void STSPController::step(const sensor* sensors, int sensornumber,
      stepsize = odeconfig.simStepSize*odeconfig.controlInterval;
 
      for(int i= 0; i< number_motors; i++){
-         neuron[i].sensor  = sensors[0];
+         neuron[i].sensor  = sensors[i];
          neuron[i].u_new   = neuron[i].u_old +
          		     ((U(neuron[i].y_old)-neuron[i].u_old)/T_u)*stepsize; 
          neuron[i].phi_new = neuron[i].phi_old +
