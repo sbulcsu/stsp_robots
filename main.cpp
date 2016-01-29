@@ -55,7 +55,7 @@ public:
     /********** ROBOTS *********/
     BarrelRobotConf  conf = BarrelRobot::getDefaultConf();
     conf.diameter = 2.0;
-    conf.pendularrange  = 0.5;  // 0.5 entspricht der Hülle
+    conf.pendularrange  = .5;  // 1. at the surface 
     conf.spheremass   = 1;
     conf.pendularmass = 1;
     conf.motorpowerfactor  = 30;  //150;

@@ -162,7 +162,7 @@ void BarrelRobot::notifyOnChange(const paramkey& key){
      }
      if(key == "pendularrange"){
 	for(unsigned int i=0; i<numberaxis; i++){
-	    servo[i]->setMinMax(-conf.diameter*conf.pendularrange, conf.diameter*conf.pendularrange);
+	    servo[i]->setMinMax(-0.5*conf.diameter*conf.pendularrange, 0.5*conf.diameter*conf.pendularrange);
 	}
 	cout << " changed pendularrange of sliders" << endl;
      }
@@ -212,8 +212,8 @@ void BarrelRobot::create(const osg::Matrix& pose){
 
 
        servo[n] = new SliderServo(dynamic_cast<OneAxisJoint*>(joints[n]), 
-                                  -conf.diameter*conf.pendularrange, 
-                                  conf.diameter*conf.pendularrange, 
+                                  -0.5*conf.diameter*conf.pendularrange, 
+                                  0.5*conf.diameter*conf.pendularrange, 
                                   conf.pendularmass*conf.motorpowerfactor, 
                                   sqrt(4*conf.pendularmass/(conf.pendularmass*conf.motorpowerfactor)), 
                                   0, 100, dInfinity);
@@ -277,8 +277,8 @@ void BarrelRobot::init(){
      memset(axis, 0, sizeof(void*)* servono);
      memset(servo, 0, sizeof(void*)* servono); //und zwar von: objects, joints, axis, servo
      this->conf.pendulardiameter = conf.diameter/7;
-     addParameter("motorpower", &this->conf.motorpowerfactor, 0, 500, "  ");
-     addParameter("pendularrange",&this->conf.pendularrange,0,0.5, "from 0 to 0.5 (0.5: bounds of slider joints = robots surface)");
+     addParameter("motorpower", &this->conf.motorpowerfactor, 0, 500, "from 0 to 500");
+     addParameter("pendularrange",&this->conf.pendularrange,0,1, "from 0 to 1 (bounds of slider joints = robots surface)");
      addParameter("pendularmass",&this->conf.pendularmass,0,0.4, "mass of the slider");
 };
 

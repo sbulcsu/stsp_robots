@@ -44,8 +44,8 @@ protected:
   double y(double x);
   double U(double y);
   double PHI(double y, double u);
-  double target(double y);
-  double scalingPos(double sensor);
+  double mtarget(double y);
+  double mtargetInv(double sensor);
 
   std::string name;
   double a; 

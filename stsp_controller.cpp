@@ -26,7 +26,7 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
 
      addParameterDef("a", &a,0.4);
      addParameterDef("b", &b,0);   
-     addParameterDef("r", &r,0.5, "scaling factor of the sigmoidal function (<=1)");
+     addParameterDef("r", &r,1., "scaling factor of the sigmoidal function (<=1)");
      addParameterDef("w_0", &w_0, 100., "");
      addParameterDef("z_0", &z_0, -300., "");
      addParameterDef("T_u", &T_u, 0.3, "");
@@ -66,14 +66,15 @@ void STSPController::step(const sensor* sensors, int sensornumber,
          		     *stepsize; 
          neuron[i].x_new   = neuron[i].x_old + 
          		     (- gamma* neuron[i].x_old 
-                             + w_0* scalingPos( neuron[i].sensor ))   // durch funktion ersetzen
+                             + w_0* mtargetInv( neuron[i].sensor ))   // durch funktion ersetzen
          		     *stepsize;
          for(int j=0; j<number_motors; j++){
-             if(i==j) continue;
+	     if (i!=j) {
              neuron[i].x_new += (z_0* neuron[j].u_old* neuron[j].phi_old* neuron[j].y_old)* stepsize;
+	     }
          }
          neuron[i].y_new    = y( neuron[i].x_new );
-         motors[i]          = target( neuron[i].y_new );
+         motors[i]          = mtarget( neuron[i].y_new );
      }
      
      /*** rewriting for next timestep ***/
@@ -97,11 +98,11 @@ double STSPController::PHI(double y, double u){
        return  1.- (u* y)/ U_max;
 };
 
-double STSPController::target(double y){
+double STSPController::mtarget(double y){
        return r* ( 2*y - 1);
 };
 
-double STSPController::scalingPos(double sensor){
+double STSPController::mtargetInv(double sensor){
        return sensor/(r*2) + 0.5 ;
 };
 
