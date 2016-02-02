@@ -37,13 +37,15 @@ public:
     return true;
   }
 
-  double y(double x);
-  double U(double y);
-  double PHI(double y, double u);
 
 protected:
   const lpzrobots::OdeConfig& odeconfig;
 
+  double y(double x);
+  double U(double y);
+  double PHI(double y, double u);
+  double mtarget(double y);
+  double mtargetInv(double sensor);
 
   std::string name;
   double a; 
@@ -61,28 +63,19 @@ protected:
   double gamma;
   double r; 
 
-  double sensor0;
-  double sensor1;
 
-  double x0_old;
-  double x1_old;
-  double x0_new;
-  double x1_new;
-
-  double y0_old;
-  double y1_old;
-  double y0_new;
-  double y1_new;
-  
-  double u0_old;
-  double u1_old;
-  double u0_new;
-  double u1_new;
-
-  double phi0_old;
-  double phi1_old;
-  double phi0_new;
-  double phi1_new;
+  struct Neuron{
+	 double sensor;
+	 double x_old;
+	 double x_new;
+	 double y_old;
+	 double y_new;
+	 double u_old;
+	 double u_new;
+	 double phi_old;
+	 double phi_new;
+  };
+  std::vector<Neuron> neuron;
 
 };
 
