@@ -73,7 +73,7 @@ public:
     modus = SpeedSensor::Rotational; 
     barrel->addSensor(std::make_shared<SpeedSensor>(1,SpeedSensor::Rotational),Attachment(-1));
 
-    controller = new STSPController(global.odeConfig );
+    controller = new STSPController(global.odeConfig, conf.diameter, conf.pendularrange );
     One2OneWiring* wiring = new One2OneWiring ( new ColorUniformNoise(0.1) );
     OdeAgent* agent = new OdeAgent ( globalData );
     agent->init ( controller , barrel , wiring );

@@ -9,7 +9,7 @@ class STSPController : public AbstractController {
 public:
 
 
-  STSPController(const lpzrobots::OdeConfig& odeconfig );
+  STSPController(const lpzrobots::OdeConfig& odeconfig, double diameter, double prange ); 
 
   virtual void init(int sensornumber, int motornumber, RandGen* randGen = 0);
 
@@ -54,6 +54,8 @@ protected:
 
   int number_sensors;
   int number_motors;
+  double radius;     
+  double pendularrange; 
 
   double w_0;
   double z_0;
@@ -74,6 +76,7 @@ protected:
 	 double u_new;
 	 double phi_old;
 	 double phi_new;
+	 double x_a;  
   };
   std::vector<Neuron> neuron;
 

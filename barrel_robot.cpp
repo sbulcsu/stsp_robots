@@ -160,12 +160,12 @@ void BarrelRobot::notifyOnChange(const paramkey& key){
 	}
 	cout << " changed power and damping of pd-controller" << endl;
      }
-     if(key == "pendularrange"){
-	for(unsigned int i=0; i<numberaxis; i++){
-	    servo[i]->setMinMax(-0.5*conf.diameter*conf.pendularrange, 0.5*conf.diameter*conf.pendularrange);
-	}
-	cout << " changed pendularrange of sliders" << endl;
-     }
+     //if(key == "pendularrange"){
+     //   for(unsigned int i=0; i<numberaxis; i++){
+     //       servo[i]->setMinMax(-0.5*conf.diameter*conf.pendularrange, 0.5*conf.diameter*conf.pendularrange);
+     //   }
+     //   cout << " changed pendularrange of sliders" << endl;
+     //}
      if(key == "pendularmass"){
 	objects[Pendular1]->setMass(conf.pendularmass);    
 	if(objects[Pendular2]) objects[Pendular2]->setMass(conf.pendularmass);    
@@ -278,7 +278,7 @@ void BarrelRobot::init(){
      memset(servo, 0, sizeof(void*)* servono); //und zwar von: objects, joints, axis, servo
      this->conf.pendulardiameter = conf.diameter/7;
      addParameter("motorpower", &this->conf.motorpowerfactor, 0, 500, "from 0 to 500");
-     addParameter("pendularrange",&this->conf.pendularrange,0,1, "from 0 to 1 (bounds of slider joints = robots surface)");
+     //addParameter("pendularrange",&this->conf.pendularrange,0,1, "from 0 to 1 (bounds of slider joints = robots surface)");
      addParameter("pendularmass",&this->conf.pendularmass,0,0.4, "mass of the slider");
 };
 
