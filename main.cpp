@@ -13,6 +13,7 @@
 #include <ode_robots/sensor.h>
 
 #include "barrel_robot.h"
+#include "sphere_robot.h"
 #include "stsp_controller.h"
 
 using namespace lpzrobots;
