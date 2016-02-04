@@ -64,18 +64,18 @@ namespace lpzrobots {
   /**
    *constructor
    **/
-  SphereRobot::SphereRobot ( const OdeHandle& odeHandle,
-                             const OsgHandle& osgHandle,
-                             const SphereRobotConf& conf,
-                             const std::string& name,
-                             const std::string& revision,
-                             double transparency)
-    : OdeRobot ( odeHandle, osgHandle, name, revision),
-      conf(conf),transparency(transparency)
-  {
-    numberaxis=3;
-    init();
-  }
+	//  SphereRobot::SphereRobot ( const OdeHandle& odeHandle,
+//                             const OsgHandle& osgHandle,
+//                             const SphereRobotConf& conf,
+//                             const std::string& name,
+//                             const std::string& revision,
+//                             double transparency)
+//    : OdeRobot ( odeHandle, osgHandle, name, revision),
+//      conf(conf),transparency(transparency)
+//  {
+//    numberaxis=3;
+//    init();
+//  }
 
 
   void SphereRobot::init(){

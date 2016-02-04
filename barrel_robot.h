@@ -1,5 +1,5 @@
-#ifndef __SPHEREROBOT3MASSES_H
-#define __SPHEREROBOT3MASSES_H
+#ifndef __BARRELROBOT_H
+#define __BARRELROBOT_H
 
 #include <ode_robots/primitive.h>
 #include <ode_robots/joint.h>

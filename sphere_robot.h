@@ -22,8 +22,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef __SPHEREROBOT3MASSES_H
-#define __SPHEREROBOT3MASSES_H
+#ifndef __SPHEREROBOT_H
+#define __SPHEREROBOT_H
 
 #include <ode_robots/primitive.h>
 #include <ode_robots/joint.h>
@@ -66,6 +66,9 @@ public:
   void addSensor(Sensor* s) { sensors.push_back(s); }
 } SphereRobotConf;
 
+
+
+
 /**
    A spherical robot with 3 internal masses, which can slide on their orthogonal axes.
    This robot was inspired by Julius Popp (http://sphericalrobots.com)
@@ -90,20 +93,17 @@ protected:
   bool created;
 
 public:
-
-  /**
-   *constructor
-   **/
   SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
-                       const SphereRobotConf& conf, const std::string& name, double transparency=0.5, int axes_number=3);
+                const SphereRobotConf& conf, const std::string& name, 
+		double transparency=0.5, int axes_number=3);
 
 protected:
   /**
    *constructor for children
    **/
-  SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
-                       const SphereRobotConf& conf,
-                       const std::string& name, const std::string& revision, double transparency);
+//  SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
+//                       const SphereRobotConf& conf,
+//                       const std::string& name, const std::string& revision, double transparency);
   /// initialises some internal variables
   void init();
 public:
