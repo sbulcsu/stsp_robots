@@ -80,11 +80,11 @@ public:
 
     else if(type == TypeSphere){
        SphereRobotConf sconf = SphereRobot::getDefaultConf();
-       robot = new SphereRobot( odeHandle, osgHandle, SphereRobot::getDefaultConf(), "Sphere", 0.4);
+       robot = new SphereRobot( odeHandle, osgHandle, sconf, "Sphere", 0.4);
        robot->place(osg::Matrix::translate(0,0,0.3));
-       auto controller = new STSPController( global.odeConfig, sconf.diameter, sconf.pendularrange);
-       auto wiring = new One2OneWiring( new ColorUniformNoise(0.1));
-       auto agent = new OdeAgent( globalData );
+       controller = new STSPController( global.odeConfig, sconf.diameter, sconf.pendularrange);
+       One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1));
+       OdeAgent* agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
        global.agents.push_back( agent );
        global.configs.push_back( controller );
