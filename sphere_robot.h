@@ -30,7 +30,7 @@
 #include <ode_robots/oneaxisservo.h>
 #include <ode_robots/oderobot.h>
 #include <ode_robots/sensor.h>
-#include <ode_robots/raysensorbank.h>
+//#include <ode_robots/raysensorbank.h>
 
 
 namespace lpzrobots {
@@ -39,30 +39,14 @@ typedef struct {
 public:
     double diameter;
     double spheremass;
-    double pendulardiameter;
+    double pendulardiameter; //initialized in constructor
     double pendularmass;
     double motorpowerfactor; 
     double pendularrange;  
-    bool motorsensor;     
     double axesShift; 
-
     void destroy();
-    std::list<Sensor*> sensors;
+    std::list<Sensor*> sensors;                        //CONFSENSOR
     void addSensor(Sensor* s) { sensors.push_back(s); }
-
-//IRS    bool irAxis1;            //TODO all ir staff 
-//IRS    bool irAxis2;
-//IRS    bool irAxis3;
-//IRS    bool irRing;         
-//IRS    bool irSide;        
-//IRS    RaySensor::rayDrawMode drawIRs;
-//IRS    double irsensorscale; 
-//IRS    double irCharacter;  
-//IRS    RaySensor* irSensorTempl;  
-//IRS    double motor_ir_before_sensors; 
-
-    double brake;       
-
 } SphereRobotConf;
 
 
@@ -71,31 +55,17 @@ class SphereRobot : public OdeRobot{
 public:
    static SphereRobotConf getDefaultConf(){
           SphereRobotConf c;
-          c.diameter    	= 1;
-          c.spheremass 		= .3;
+          c.diameter    	= 2.;
+          c.spheremass 		= 1.;
           c.pendularmass 	= 1.0;
-          c.pendularrange	= 0.20; 
+          c.pendularrange	= 0.5; 
           c.motorpowerfactor 	= 100;
-          c.motorsensor		= true;
           c.axesShift		= 0;
-
-//IRS          c.irAxis1		= false;
-//IRS          c.irAxis2		= false;
-//IRS          c.irAxis3		= false;
-//IRS          c.irRing		= false;
-//IRS          c.irSide		= false;
-//IRS          c.drawIRs=RaySensor::drawAll;
-//IRS          c.irsensorscale	= 1.5;
-//IRS          c.irCharacter		= 1;
-//IRS          c.irSensorTempl	= 0;
-//IRS          c.motor_ir_before_sensors = false;
-
-          c.brake		= 0;
           return c;
   } 
   SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
                 const SphereRobotConf& conf, const std::string& name, 
-		double transparency=0.5, int axes_number=3);
+		double transparency=0.5, unsigned int axes_number=3);
   virtual ~SphereRobot();
   virtual void update();
   virtual void placeIntern(const osg::Matrix& pose);
@@ -110,10 +80,9 @@ public:
 
 
 protected:
-  static const int servono=3;
   virtual void create(const osg::Matrix& pose);
   virtual void destroy();
-  void init();
+  static const int servono=3;
   SliderServo* servo[servono];
   OSGPrimitive* axis[servono];
   OSGPrimitive* axisdots[servono];
@@ -123,7 +92,6 @@ protected:
   unsigned int numberaxis;
   bool created;
 
-  RaySensorBank irSensorBank; 
 
 };
 
