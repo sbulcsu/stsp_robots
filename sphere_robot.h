@@ -35,131 +35,95 @@
 
 namespace lpzrobots {
 
-  /// configuration object for the SphereRobot robot.
 typedef struct {
 public:
-  double diameter;
-  double spheremass;
-  double pendulardiameter; ///< automatically set
-  double pendularmass;
-  double motorpowerfactor; ///< power factor for servos w.r.t. pendularmass
-  double pendularrange;    ///< fraction of the diameter the pendular masses can move to one side
-  bool motorsensor;        ///< motor values as sensors
-  bool irAxis1;
-  bool irAxis2;
-  bool irAxis3;
-  bool irRing;            ///< IR sensors in a ring in x,z plane (collides with irAxis1 and irAxis3)
-  bool irSide;            ///< 4 IR senors to both side in y direction (collides with irAxis2)
-  RaySensor::rayDrawMode drawIRs;
-  double irsensorscale; ///< range of the ir sensors in units of diameter
-  double irCharacter;   ///< characteristics of sensor (\f[ x^c \f] where x is the range-distance)
-  RaySensor* irSensorTempl;  ///< template for creation of the other ir sensors (if 0 then IRSensor(irCharacter))
-  double motor_ir_before_sensors; ///< if true motor sensors and ir sensors are given before additional sensors
-  double brake;         ///< if nonzero the robot brakes (deaccelerates actively/magically)
-  double axesShift; ///< defines how much the axes are shifted from the center
+    double diameter;
+    double spheremass;
+    double pendulardiameter;
+    double pendularmass;
+    double motorpowerfactor; 
+    double pendularrange;  
+    bool motorsensor;     
+    double axesShift; 
 
-  /// function that deletes sensors
-  void destroy();
-  /// list of sensors that are mounted at the robot. (e.g.\ AxisOrientationSensor)
-  std::list<Sensor*> sensors;
-  /// adds a sensor to the list of sensors
-  void addSensor(Sensor* s) { sensors.push_back(s); }
+    void destroy();
+    std::list<Sensor*> sensors;
+    void addSensor(Sensor* s) { sensors.push_back(s); }
+
+//IRS    bool irAxis1;            //TODO all ir staff 
+//IRS    bool irAxis2;
+//IRS    bool irAxis3;
+//IRS    bool irRing;         
+//IRS    bool irSide;        
+//IRS    RaySensor::rayDrawMode drawIRs;
+//IRS    double irsensorscale; 
+//IRS    double irCharacter;  
+//IRS    RaySensor* irSensorTempl;  
+//IRS    double motor_ir_before_sensors; 
+
+    double brake;       
+
 } SphereRobotConf;
 
 
 
-
-/**
-   A spherical robot with 3 internal masses, which can slide on their orthogonal axes.
-   This robot was inspired by Julius Popp (http://sphericalrobots.com)
-*/
-class SphereRobot : public OdeRobot
-{
+class SphereRobot : public OdeRobot{
 public:
-  /// enum for the objects of the robot
+   static SphereRobotConf getDefaultConf(){
+          SphereRobotConf c;
+          c.diameter    	= 1;
+          c.spheremass 		= .3;
+          c.pendularmass 	= 1.0;
+          c.pendularrange	= 0.20; 
+          c.motorpowerfactor 	= 100;
+          c.motorsensor		= true;
+          c.axesShift		= 0;
+
+//IRS          c.irAxis1		= false;
+//IRS          c.irAxis2		= false;
+//IRS          c.irAxis3		= false;
+//IRS          c.irRing		= false;
+//IRS          c.irSide		= false;
+//IRS          c.drawIRs=RaySensor::drawAll;
+//IRS          c.irsensorscale	= 1.5;
+//IRS          c.irCharacter		= 1;
+//IRS          c.irSensorTempl	= 0;
+//IRS          c.motor_ir_before_sensors = false;
+
+          c.brake		= 0;
+          return c;
+  } 
+  SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
+                const SphereRobotConf& conf, const std::string& name, 
+		double transparency=0.5, int axes_number=3);
+  virtual ~SphereRobot();
+  virtual void update();
+  virtual void placeIntern(const osg::Matrix& pose);
+  virtual void doInternalStuff(GlobalData& globalData);
+  virtual void sense(GlobalData& globalData) override;
+  virtual int getSensorsIntern( sensor* sensors, int sensornumber );
+  virtual void setMotorsIntern( const double* motors, int motornumber );
+  virtual int getMotorNumberIntern();
+  virtual int getSensorNumberIntern();
+  virtual void notifyOnChange(const paramkey& key);
   enum parts { Base, Pendular1, Pendular2, Pendular3, Last } ;
+
 
 protected:
   static const int servono=3;
-  unsigned int numberaxis;
-
+  virtual void create(const osg::Matrix& pose);
+  virtual void destroy();
+  void init();
   SliderServo* servo[servono];
   OSGPrimitive* axis[servono];
   OSGPrimitive* axisdots[servono];
 
   SphereRobotConf conf;
-  RaySensorBank irSensorBank; ///< a collection of ir sensors
   double transparency;
+  unsigned int numberaxis;
   bool created;
 
-public:
-  SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
-                const SphereRobotConf& conf, const std::string& name, 
-		double transparency=0.5, int axes_number=3);
-
-protected:
-  /**
-   *constructor for children
-   **/
-//  SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
-//                       const SphereRobotConf& conf,
-//                       const std::string& name, const std::string& revision, double transparency);
-  /// initialises some internal variables
-  void init();
-public:
-  virtual ~SphereRobot();
-
-
-  /// default configuration
-  static SphereRobotConf getDefaultConf(){
-    SphereRobotConf c;
-    c.diameter     = 1;
-    c.spheremass   = .3;// 0.1
-    c.pendularmass  = 1.0;
-    c.pendularrange  = 0.20; // range of the slider from center in multiple of diameter [-range,range]
-    c.motorpowerfactor  = 100;
-    c.motorsensor = true;
-    c.irAxis1=false;
-    c.irAxis2=false;
-    c.irAxis3=false;
-    c.irRing=false;
-    c.irSide=false;
-    c.drawIRs=RaySensor::drawAll;
-    c.irsensorscale=1.5;
-    c.irCharacter=1;
-    c.irSensorTempl=0;
-    c.motor_ir_before_sensors=false;
-    c.axesShift=0;
-    c.brake=0;
-    c.axesShift=0;
-   return c;
-  }
-
-  virtual void update();
-
-  virtual void placeIntern(const osg::Matrix& pose);
-
-  virtual void doInternalStuff(GlobalData& globalData);
-
-  virtual void sense(GlobalData& globalData) override;
-
-  virtual int getSensorsIntern( sensor* sensors, int sensornumber );
-
-  virtual void setMotorsIntern( const double* motors, int motornumber );
-
-  virtual int getMotorNumberIntern();
-
-  virtual int getSensorNumberIntern();
-
-  /******** CONFIGURABLE ***********/
-  virtual void notifyOnChange(const paramkey& key);
-
-
-protected:
-
-  virtual void create(const osg::Matrix& pose);
-  virtual void destroy();
-
+  RaySensorBank irSensorBank; 
 
 };
 
