@@ -35,13 +35,6 @@ using namespace std;
 
 namespace lpzrobots {
 /********************/
-  //void SphereRobotConf::destroy(){
-  //     /**/for(list<Sensor*>::iterator i = sensors.begin(); i != sensors.end(); i++){
-  //     /**/  if(*i) delete *i;
-  //     /**/}
-  //     /**/sensors.clear();             //SENS
-  //}
-/********************/
   SphereRobot::SphereRobot( const OdeHandle& odeHandle, 
                             const OsgHandle& osgHandle,
                             const SphereRobotConf& conf,
@@ -66,9 +59,6 @@ namespace lpzrobots {
 /********************/
   SphereRobot::~SphereRobot(){
                destroy();
-               //FOREACH(std::list<Sensor*>, conf.sensors, s){     //SENS
-               //  if(*s) delete *s;
-               //}
   }
 /********************/
   void SphereRobot::update(){
@@ -86,42 +76,25 @@ namespace lpzrobots {
 			                   i==2?conf.diameter/2:0)* pose);
          }
        }
-       //FOREACH(std::list<Sensor*>, conf.sensors, s){       //SENS
-       //  (*s)->update();
-       //}
   }
 /********************/   // garantees that the robot is placed above the ground
   void SphereRobot::placeIntern(const osg::Matrix& pose){
        osg::Matrix p2;
        p2 = pose * osg::Matrix::translate(osg::Vec3(0, 0, conf.diameter/2));
        create(p2);
-  };
+  }
 /********************/   
-  void SphereRobot::doInternalStuff(GlobalData& global){
-       OdeRobot::doInternalStuff(global);
-       //FOREACH(list<Sensor*>, conf.sensors, s){       //SENS
-       //  (*s)->sense(global);
-       //}
-  }
-/********************/
-  void SphereRobot::sense(GlobalData& globalData) {
-       OdeRobot::sense(globalData);
-  }
-/********************/
   int SphereRobot::getSensorsIntern( sensor* sensors, int sensornumber) {
       int len=0;
       assert(created);
       for(unsigned int n = 0; n < numberaxis; n++ ) {
-      	  sensors[len] = servo[n]->get();            //SENS
+      	  sensors[len] = servo[n]->get();            
           len++;
       }
       for(unsigned int n = 0; n< numberaxis; n++){
           sensors[len] = servo[n]->get()* conf.pendularrange* 0.5*  conf.diameter;
           len++; 
       }
-      //FOREACH(list<Sensor*>, conf.sensors, i){      //SENS
-      //  len += (*i)->get(sensors+len, sensornumber-len);
-      //}
       return len;
   }
 /********************/
@@ -130,18 +103,6 @@ namespace lpzrobots {
        for ( int n = 0; n < len; n++ ) {
          servo[n]->set(motors[n]);
        }
-  }
-/********************/
-  int SphereRobot::getMotorNumberIntern(){
-      return numberaxis;
-  }
-/********************/
-  int SphereRobot::getSensorNumberIntern() {
-      int s=0;
-      //FOREACHC(list<Sensor*>, conf.sensors, i){       //SENS
-      //  s += (*i)->getSensorNumber();
-      //}
-      return 2*numberaxis + s;     
   }
 /********************/
   void SphereRobot::notifyOnChange(const paramkey& key){
@@ -170,9 +131,9 @@ namespace lpzrobots {
   void SphereRobot::destroy(){
        if(created){
           for( unsigned int i=0; i<numberaxis; i++){
-           if(servo[i]) delete servo[i];
-           if(axis[i]) delete axis[i];
-	   if(axisdots[i]) delete axisdots[i];
+               if( servo[i] ) delete servo[i];
+               if( axis[i] ) delete axis[i];
+	       if( axisdots[i] ) delete axisdots[i];
          }
          odeHandle.deleteSpace();
        }
@@ -198,7 +159,7 @@ namespace lpzrobots {
     for( unsigned int n = 0; n < numberaxis; n++ ) {
          pendular[n] = new Sphere(conf.pendulardiameter/2);
          pendular[n]->init(odeHandle, conf.pendularmass, osgHandleX[n],
-                           Primitive::Body | Primitive::Draw); // without geom
+                           Primitive::Body | Primitive::Draw); // without Geom
          pendular[n]->setPose(Matrix::translate(0,0,(n==0?-1:1)*conf.axesShift)*pose);
          joints[n] = new SliderJoint(objects[Base], pendular[n],
                                     p, Axis((n==0), (n==1), (n==2))*pose);

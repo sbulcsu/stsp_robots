@@ -43,16 +43,13 @@ public:
     double motorpowerfactor; 
     double pendularrange;  
     double axesShift; 
-    //void destroy();
-    //std::list<Sensor*> sensors;                          //CONFSENSOR
-    //void addSensor(Sensor* s) { sensors.push_back(s); }  //CONFSENSOR
 } SphereRobotConf;
 
 
 
 class SphereRobot : public OdeRobot{
 public:
-   static SphereRobotConf getDefaultConf(){
+  static SphereRobotConf getDefaultConf(){
           SphereRobotConf c;
           c.diameter    	= 2.;
           c.spheremass 		= 1.;
@@ -64,23 +61,21 @@ public:
   } 
   SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
                 const SphereRobotConf& conf, const std::string& name, 
-		double transparency=0.5, unsigned int axes_number=3);
-  virtual ~SphereRobot();
-  virtual void update();
-  virtual void placeIntern(const osg::Matrix& pose);
-  virtual void doInternalStuff(GlobalData& globalData);
-  virtual void sense(GlobalData& globalData) override;
-  virtual int getSensorsIntern( sensor* sensors, int sensornumber );
-  virtual void setMotorsIntern( const double* motors, int motornumber );
-  virtual int getMotorNumberIntern();
-  virtual int getSensorNumberIntern();
-  virtual void notifyOnChange(const paramkey& key);
+		double transparency=0.5, unsigned int axes_number=3 );
+  ~SphereRobot();
+  void update(); // update ODE and OSG parts
+  void placeIntern( const osg::Matrix& pose ); // set Pos of robot when constructing
+  int getSensorsIntern( sensor* sensors, int sensornumber ); // for specific sensor handling
+  void setMotorsIntern( const double* motors, int motornumber );
+  int getMotorNumberIntern(){ return numberaxis; }; 
+  int getSensorNumberIntern(){ return 2*numberaxis; }; // number of sensors, to set size of sensor list  
+  void notifyOnChange( const paramkey& key );
   enum parts { Base, Pendular1, Pendular2, Pendular3, Last };
 
 protected:
-  virtual void create(const osg::Matrix& pose);
+  virtual void create( const osg::Matrix& pose );
   virtual void destroy();
-  static const int servono=3;
+  static const int servono=3; // needed for arrays
   SliderServo* servo[servono];
   OSGPrimitive* axis[servono];
   OSGPrimitive* axisdots[servono];
