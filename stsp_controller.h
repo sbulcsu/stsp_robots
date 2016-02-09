@@ -76,7 +76,7 @@ protected:
 	 double u_new;
 	 double phi_old;
 	 double phi_new;
-	 double x_a;  
+	 //double x_a;  
   };
   std::vector<Neuron> neuron;
 

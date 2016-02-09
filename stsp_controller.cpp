@@ -51,9 +51,9 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
 	 addInspectableValue("u"+ itos(i), &neuron[i].u_old, "  ");
 	 addInspectableValue("phi"+ itos(i), &neuron[i].phi_old, "  ");
 	 addInspectableValue("y"+ itos(i), &neuron[i].y_old, "  ");
-	 addInspectableValue("sensor"+ itos(i), &neuron[i].sensor, "  ");
-	 neuron[i].x_a = 0; 
-         addInspectableValue("x_a"+ itos(i), &neuron[i].x_a ,  "   ");  
+	 //addInspectableValue("sensor"+ itos(i), &neuron[i].sensor, "  ");
+	 //neuron[i].x_a = 0; 
+         //addInspectableValue("x_a"+ itos(i), &neuron[i].x_a ,  "   ");  
      }
 };
 
@@ -63,7 +63,7 @@ void STSPController::step(const sensor* sensors, int sensornumber,
 
      for(int i= 0; i< number_motors; i++){
          neuron[i].sensor  = sensors[i];
-         neuron[i].x_a     = neuron[i].sensor* pendularrange *radius; 
+         //neuron[i].x_a     = neuron[i].sensor* pendularrange *radius; 
          neuron[i].u_new   = neuron[i].u_old +
          		     ((U(neuron[i].y_old)-neuron[i].u_old)/T_u)*stepsize; 
          neuron[i].phi_new = neuron[i].phi_old +

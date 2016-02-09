@@ -35,12 +35,12 @@ using namespace std;
 
 namespace lpzrobots {
 /********************/
-  void SphereRobotConf::destroy(){
-       for(list<Sensor*>::iterator i = sensors.begin(); i != sensors.end(); i++){
-         if(*i) delete *i;
-       }
-       sensors.clear();
-  }
+  //void SphereRobotConf::destroy(){
+  //     /**/for(list<Sensor*>::iterator i = sensors.begin(); i != sensors.end(); i++){
+  //     /**/  if(*i) delete *i;
+  //     /**/}
+  //     /**/sensors.clear();             //SENS
+  //}
 /********************/
   SphereRobot::SphereRobot( const OdeHandle& odeHandle, 
                             const OsgHandle& osgHandle,
@@ -60,15 +60,15 @@ namespace lpzrobots {
        addParameter("pendularmass",&this->conf.pendularmass, "mass of the slider");
        addParameter("motorpower", &this->conf.motorpowerfactor, 
 		    "power of PDcontroller = motorpower*pendularmass ");
-       //addParameter("pendularrange",&this->conf.pendularrange,
-       //	      "range of the masses along the sliders");
+       addParameter("pendularrange",&this->conf.pendularrange,   
+		    "range of the masses along the sliders");
   }
 /********************/
   SphereRobot::~SphereRobot(){
                destroy();
-               FOREACH(std::list<Sensor*>, conf.sensors, s){     //CONFSENSOR
-                 if(*s) delete *s;
-               }
+               //FOREACH(std::list<Sensor*>, conf.sensors, s){     //SENS
+               //  if(*s) delete *s;
+               //}
   }
 /********************/
   void SphereRobot::update(){
@@ -86,9 +86,9 @@ namespace lpzrobots {
 			                   i==2?conf.diameter/2:0)* pose);
          }
        }
-       FOREACH(std::list<Sensor*>, conf.sensors, s){       //CONFSENSOR
-         (*s)->update();
-       }
+       //FOREACH(std::list<Sensor*>, conf.sensors, s){       //SENS
+       //  (*s)->update();
+       //}
   }
 /********************/   // garantees that the robot is placed above the ground
   void SphereRobot::placeIntern(const osg::Matrix& pose){
@@ -99,9 +99,9 @@ namespace lpzrobots {
 /********************/   
   void SphereRobot::doInternalStuff(GlobalData& global){
        OdeRobot::doInternalStuff(global);
-       FOREACH(list<Sensor*>, conf.sensors, s){       //CONFSENSOR
-         (*s)->sense(global);
-       }
+       //FOREACH(list<Sensor*>, conf.sensors, s){       //SENS
+       //  (*s)->sense(global);
+       //}
   }
 /********************/
   void SphereRobot::sense(GlobalData& globalData) {
@@ -111,13 +111,17 @@ namespace lpzrobots {
   int SphereRobot::getSensorsIntern( sensor* sensors, int sensornumber) {
       int len=0;
       assert(created);
-      for( unsigned int n = 0; n < numberaxis; n++ ) {
-      	   sensors[len] = servo[n]->get(); 
-           len++;
+      for(unsigned int n = 0; n < numberaxis; n++ ) {
+      	  sensors[len] = servo[n]->get();            //SENS
+          len++;
       }
-      FOREACH(list<Sensor*>, conf.sensors, i){      //CONFSENSOR
-        len += (*i)->get(sensors+len, sensornumber-len);
+      for(unsigned int n = 0; n< numberaxis; n++){
+          sensors[len] = servo[n]->get()* conf.pendularrange* 0.5*  conf.diameter;
+          len++; 
       }
+      //FOREACH(list<Sensor*>, conf.sensors, i){      //SENS
+      //  len += (*i)->get(sensors+len, sensornumber-len);
+      //}
       return len;
   }
 /********************/
@@ -134,10 +138,10 @@ namespace lpzrobots {
 /********************/
   int SphereRobot::getSensorNumberIntern() {
       int s=0;
-      FOREACHC(list<Sensor*>, conf.sensors, i){       //CONFSENSOR
-        s += (*i)->getSensorNumber();
-      }
-     return numberaxis + s;
+      //FOREACHC(list<Sensor*>, conf.sensors, i){       //SENS
+      //  s += (*i)->getSensorNumber();
+      //}
+      return 2*numberaxis + s;     
   }
 /********************/
   void SphereRobot::notifyOnChange(const paramkey& key){
@@ -148,12 +152,13 @@ namespace lpzrobots {
           }
           cout << " changed power and damping of pd-controller" << endl;
        }
-       //if(key == "pendularrange"){
-       //   for(unsigned int i=0; i<numberaxis; i++){
-       //      servo[i]->setMinMax(-conf.diameter*conf.pendularrange, conf.diameter*conf.pendularrange);
-       //   }
-       //   cout << " changed pendularrange of sliders" << endl;
-       //}
+       if(key == "pendularrange"){    
+          for(unsigned int i=0; i<numberaxis; i++){
+             servo[i]->setMinMax(-0.5*conf.diameter*conf.pendularrange, 
+        			  0.5*conf.diameter*conf.pendularrange);
+          }
+          cout << " changed pendularrange of sliders" << endl;
+       }
        if(key == "pendularmass"){
 	  for(unsigned int i=0; i < numberaxis; i++){
 	      objects[1+i]->setMass(conf.pendularmass); 
@@ -202,22 +207,19 @@ namespace lpzrobots {
          joints[n]->setParam ( dParamStopERP, 0.9);
          joints[n]->setParam ( dParamCFM, 0.001);
          servo[n] = new SliderServo(dynamic_cast<OneAxisJoint*>(joints[n]),
-                                    -0.5*conf.diameter*conf.pendularrange,
-                                    0.5*conf.diameter*conf.pendularrange,
-                                    conf.pendularmass*conf.motorpowerfactor,
-           			 sqrt(4/conf.motorpowerfactor),
-           			 0, 100, dInfinity);
-         axis[n] = new OSGCylinder(conf.diameter/100, conf.diameter - conf.diameter/100);
-         axis[n]->init(osgHandleX[n], OSGPrimitive::Low);
-         axisdots[n] = new OSGSphere(conf.pendulardiameter/3);
-         axisdots[n]->init(osgHandleX[n], OSGPrimitive::Middle);
-         axisdots[n]->setMatrix(Matrix::translate(n==0?conf.diameter/2: 0, 
-           				       n==1?conf.diameter/2: 0, 
-           				       n==2?conf.diameter/2: 0)*pose);
+				    -0.5*conf.diameter*conf.pendularrange,
+				    0.5*conf.diameter*conf.pendularrange,
+				    conf.pendularmass*conf.motorpowerfactor,
+				    sqrt(4/conf.motorpowerfactor),
+				    0, 100, dInfinity);
+         axis[n] = new OSGCylinder( conf.diameter/100, conf.diameter-conf.diameter/100);
+         axis[n]->init( osgHandleX[n], OSGPrimitive::Low );
+         axisdots[n] = new OSGSphere( conf.pendulardiameter/3 );
+         axisdots[n]->init( osgHandleX[n], OSGPrimitive::Middle );
+         axisdots[n]->setMatrix( Matrix::translate( n==0?conf.diameter/2: 0, 
+						    n==1?conf.diameter/2: 0, 
+						    n==2?conf.diameter/2: 0)*pose);
          objects[n+1] = pendular[n]; // (+1) because Base is object[0]
-    }
-    FOREACH(list<Sensor*>, conf.sensors, i){           //CONFSENSOR
-        (*i)->init(objects[Base]);
     }
     created=true;
   }

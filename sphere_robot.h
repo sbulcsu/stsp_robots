@@ -30,7 +30,6 @@
 #include <ode_robots/oneaxisservo.h>
 #include <ode_robots/oderobot.h>
 #include <ode_robots/sensor.h>
-//#include <ode_robots/raysensorbank.h>
 
 
 namespace lpzrobots {
@@ -44,9 +43,9 @@ public:
     double motorpowerfactor; 
     double pendularrange;  
     double axesShift; 
-    void destroy();
-    std::list<Sensor*> sensors;                        //CONFSENSOR
-    void addSensor(Sensor* s) { sensors.push_back(s); }
+    //void destroy();
+    //std::list<Sensor*> sensors;                          //CONFSENSOR
+    //void addSensor(Sensor* s) { sensors.push_back(s); }  //CONFSENSOR
 } SphereRobotConf;
 
 
@@ -76,8 +75,7 @@ public:
   virtual int getMotorNumberIntern();
   virtual int getSensorNumberIntern();
   virtual void notifyOnChange(const paramkey& key);
-  enum parts { Base, Pendular1, Pendular2, Pendular3, Last } ;
-
+  enum parts { Base, Pendular1, Pendular2, Pendular3, Last };
 
 protected:
   virtual void create(const osg::Matrix& pose);

@@ -23,8 +23,8 @@ using namespace std;
 class ThisSim : public Simulation {
 public:
   AbstractController* controller;  
+  OdeAgent* agent;
   OdeRobot* robot;
-  Sensor* sensor;
   double friction;
   bool track = false; 
 
@@ -39,7 +39,6 @@ public:
   }
 
   void start(const OdeHandle& odeHandle, const OsgHandle& osgHandle, GlobalData& global){
-    sensor=0;
     /*********** WORLDSPARAMETER **********/
     global.odeConfig.setParam("noise",0);
     global.odeConfig.setParam("controlinterval",1);
@@ -47,12 +46,14 @@ public:
     global.odeConfig.setParam("simstepsize", 0.01);
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
     
-    /********** Camera **********/
+    /********** CAMERA **********/
     setCameraMode(Follow);            //Follow, Race or Static
     setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
 
+
+    /*********** ROBOTS  **********/
     if(type == TypeBarrel){
-       BarrelRobotConf  conf = BarrelRobot::getDefaultConf();
+       BarrelRobotConf conf = BarrelRobot::getDefaultConf();
        conf.diameter = 2.0;
        conf.pendularrange  = .5;  // 1. at the surface 
        conf.spheremass   = 1;
@@ -67,9 +68,8 @@ public:
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Rotational ),Attachment(-1));
        controller = new STSPController( global.odeConfig, conf.diameter, conf.pendularrange );
        One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1) );
-       OdeAgent* agent = new OdeAgent( globalData );
+       agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
-       if(track == true)  agent->setTrackOptions(TrackRobot(false, false, false, true, "ZSens", 50));
        //agent->fixateRobot(global,2,10);
        //FixedJoint* fixedJoint = new FixedJoint(robot->getMainPrimitive(), global.environment);
        //fixedJoint->init(odeHandle, osgHandle, true);
@@ -77,19 +77,21 @@ public:
        global.configs.push_back( controller );
        global.configs.push_back( robot ); 
     }
-
     else if(type == TypeSphere){
        SphereRobotConf sconf = SphereRobot::getDefaultConf();
-       robot = new SphereRobot( odeHandle, osgHandle, sconf, "Sphere", 0.4);
+       sconf.diameter = 2.0;
+       robot = new SphereRobot( odeHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", 0.4);
+       robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
        robot->place(osg::Matrix::translate(0,0,0.3));
        controller = new STSPController( global.odeConfig, sconf.diameter, sconf.pendularrange);
        One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1));
-       OdeAgent* agent = new OdeAgent( globalData );
+       agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
        global.agents.push_back( agent );
        global.configs.push_back( controller );
        global.configs.push_back( robot );
     }
+    if(track == true)  agent->setTrackOptions(TrackRobot(false, false, false, true, "ZSens", 50));
   };
 
 
@@ -112,16 +114,16 @@ public:
     if (down) { // only when key is pressed, not when released
       switch ( (char) key )
         {
-        case 'x' : dBodyAddTorque ( robot->getMainPrimitive()->getBody() , 100 , 0 , 0 ); break;
-        case 'X' : dBodyAddTorque ( robot->getMainPrimitive()->getBody() , -100 , 0 , 0 ); break;
-        case 'y' : dBodyAddTorque ( robot->getMainPrimitive()->getBody() , 0 , 100 , 0 ); break;
-        case 'Y' : dBodyAddTorque ( robot->getMainPrimitive()->getBody() , 0 , -100 , 0 ); break;
-        case 'z' : dBodyAddTorque ( robot->getMainPrimitive()->getBody() , 0, 0, 100 ); break;
-        case 'Z' : dBodyAddTorque ( robot->getMainPrimitive()->getBody() , 0, 0, -100 ); break;
-        case 'q' : dBodyAddForce ( robot->getMainPrimitive()->getBody() , 100, 0, 0 ); break;
-        case 'Q' : dBodyAddForce ( robot->getMainPrimitive()->getBody() , -100, 0, 0 ); break;
-        case 'w' : dBodyAddForce ( robot->getMainPrimitive()->getBody() , 0, 100, 0 ); break;
-        case 'W' : dBodyAddForce ( robot->getMainPrimitive()->getBody() , 0, -100, 0 ); break;
+        case 'x' : dBodyAddTorque( robot->getMainPrimitive()->getBody() , 100 , 0 , 0 ); break;
+        case 'X' : dBodyAddTorque( robot->getMainPrimitive()->getBody() , -100 , 0 , 0 ); break;
+        case 'y' : dBodyAddTorque( robot->getMainPrimitive()->getBody() , 0 , 100 , 0 ); break;
+        case 'Y' : dBodyAddTorque( robot->getMainPrimitive()->getBody() , 0 , -100 , 0 ); break;
+        case 'z' : dBodyAddTorque( robot->getMainPrimitive()->getBody() , 0, 0, 100 ); break;
+        case 'Z' : dBodyAddTorque( robot->getMainPrimitive()->getBody() , 0, 0, -100 ); break;
+        case 'q' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 100, 0, 0 ); break;
+        case 'Q' : dBodyAddForce( robot->getMainPrimitive()->getBody() , -100, 0, 0 ); break;
+        case 'w' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 0, 100, 0 ); break;
+        case 'W' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 0, -100, 0 ); break;
         case 'a' : controller->setParam("a", controller->getParam("a")-0.02);
                    std::cout << "all a changed to:  "<<controller->getParam("a") << std::endl;
                    break;
