@@ -51,11 +51,11 @@ class SphereRobot : public OdeRobot{
 public:
   static SphereRobotConf getDefaultConf(){
           SphereRobotConf c;
-          c.diameter    	= 2.;
+          c.diameter    	= 0.5;
           c.spheremass 		= 1.;
-          c.pendularmass 	= 1.0;
+          c.pendularmass 	= 1.;
           c.pendularrange	= 0.5; 
-          c.motorpowerfactor 	= 100;
+          c.motorpowerfactor 	= 120;
           c.axesShift		= 0;
           return c;
   } 
@@ -73,8 +73,8 @@ public:
   enum parts { Base, Pendular1, Pendular2, Pendular3, Last };
 
 protected:
-  virtual void create( const osg::Matrix& pose );
-  virtual void destroy();
+  void create( const osg::Matrix& pose );
+  void destroy();
   static const int servono=3; // needed for arrays
   SliderServo* servo[servono];
   OSGPrimitive* axis[servono];

@@ -26,11 +26,11 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
      number_motors = motornumber;
      cout<< " Number of motors: "  << number_motors << endl;
 
-     addParameterDef("a", &a,0.4);
-     addParameterDef("b", &b,0);   
-     addParameterDef("r", &r,1., "scaling factor of the sigmoidal function (<=1)");
-     addParameterDef("w_0", &w_0, 100., "");
-     addParameterDef("z_0", &z_0, -300., "");
+     addParameterDef("a", &a, 0.4);
+     addParameterDef("b", &b, 0);   
+     addParameterDef("r", &r, 1., "scaling factor of the sigmoidal function (<=1)");
+     addParameterDef("w_0", &w_0, 10., "");
+     addParameterDef("z_0", &z_0, -30., "");
      addParameterDef("T_u", &T_u, 0.3, "");
      addParameterDef("T_phi", &T_phi, 0.6, "");
      addParameterDef("U_max", &U_max, 1., "");
@@ -51,9 +51,6 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
 	 addInspectableValue("u"+ itos(i), &neuron[i].u_old, "  ");
 	 addInspectableValue("phi"+ itos(i), &neuron[i].phi_old, "  ");
 	 addInspectableValue("y"+ itos(i), &neuron[i].y_old, "  ");
-	 //addInspectableValue("sensor"+ itos(i), &neuron[i].sensor, "  ");
-	 //neuron[i].x_a = 0; 
-         //addInspectableValue("x_a"+ itos(i), &neuron[i].x_a ,  "   ");  
      }
 };
 
@@ -63,7 +60,6 @@ void STSPController::step(const sensor* sensors, int sensornumber,
 
      for(int i= 0; i< number_motors; i++){
          neuron[i].sensor  = sensors[i];
-         //neuron[i].x_a     = neuron[i].sensor* pendularrange *radius; 
          neuron[i].u_new   = neuron[i].u_old +
          		     ((U(neuron[i].y_old)-neuron[i].u_old)/T_u)*stepsize; 
          neuron[i].phi_new = neuron[i].phi_old +
@@ -71,7 +67,7 @@ void STSPController::step(const sensor* sensors, int sensornumber,
          		     *stepsize; 
          neuron[i].x_new   = neuron[i].x_old + 
          		     (- gamma* neuron[i].x_old 
-                             + w_0* mtargetInv( neuron[i].sensor ))   // durch funktion ersetzen
+                             + w_0* mtargetInv( neuron[i].sensor ))   
          		     *stepsize;
          for(int j=0; j<number_motors; j++){
 	     if (i!=j) {
