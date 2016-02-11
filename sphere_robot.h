@@ -55,7 +55,7 @@ public:
           c.spheremass 		= 1.;
           c.pendularmass 	= 1.;
           c.pendularrange	= 0.5; 
-          c.motorpowerfactor 	= 120;
+          c.motorpowerfactor 	= 120; 
           c.axesShift		= 0;
           return c;
   } 

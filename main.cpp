@@ -22,11 +22,11 @@ using namespace std;
 
 class ThisSim : public Simulation {
 public:
-  AbstractController* controller;  
+  STSPController* controller;  
   OdeAgent* agent;
   OdeRobot* robot;
   double friction;
-  bool track = false; 
+  bool track = true; 
 
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
@@ -48,7 +48,7 @@ public:
     
     /********** CAMERA **********/
     setCameraMode(Follow);            //Follow, Race or Static
-    setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
+    //setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
     setCameraHomePos(Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0));
 
 
@@ -80,6 +80,9 @@ public:
     }
     else if(type == TypeSphere){
        SphereRobotConf sconf = SphereRobot::getDefaultConf();
+       sconf.diameter = 0.5;
+       sconf.motorpowerfactor = 120;
+
        robot = new SphereRobot( odeHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
        robot->place(osg::Matrix::translate(0,0,0.3));
@@ -124,24 +127,33 @@ public:
         case 'U' : dBodyAddForce( robot->getMainPrimitive()->getBody() , -100, 0, 0 ); break;
         case 'i' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 0, 100, 0 ); break;
         case 'I' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 0, -100, 0 ); break;
-        case 'a' : controller->setParam("a", controller->getParam("a")-0.02);
-                   std::cout << "all a changed to:  "<<controller->getParam("a") << std::endl;
+        case 'a' : controller->increaseA(-0.02);
+                   std::cout << "new a:  "<<controller->getParam("a") << std::endl;
                    break;
-        case 'A' : controller->setParam("a", controller->getParam("a")+0.02);
-                   std::cout << "all a changed to:  "<<controller->getParam("a") << std::endl;
+        case 'A' : controller->increaseA(0.02);
+                   std::cout << "new a:  "<<controller->getParam("a") << std::endl;
                    break;
-        case 'w' : controller->setParam("w_0", controller->getParam("w_0")-1);
-                   std::cout << "all w_0 changed to:  "<<controller->getParam("w_0") << std::endl;
+        case 'w' : controller->increaseW(-1);
+                   std::cout << "new w_0:  "<<controller->getParam("w_0") << std::endl;
                    break;
-        case 'W' : controller->setParam("w_0", controller->getParam("w_0")+1);
-                   std::cout << "all w_0 changed to:  "<<controller->getParam("w_0") << std::endl;
+        case 'W' : controller->increaseW(1);
+                   std::cout << "new w_0:  "<<controller->getParam("w_0") << std::endl;
                    break;
-        case 'z' : controller->setParam("z_0", controller->getParam("z_0")+1);
-                   std::cout<< "all z_0 changed to:  "<<controller->getParam("z_0")<< std::endl;
+        case 'z' : controller->increaseZ(1.);
+                   std::cout<< "new z_0:  "<<controller->getParam("z_0")<< std::endl;
                    break;
-        case 'Z' : controller->setParam("z_0", controller->getParam("z_0")-1);
-                   std::cout<< "all z_0 changed to:  "<<controller->getParam("z_0")<< std::endl;
+        case 'Z' : controller->increaseZ(-1.);
+                   std::cout<< "new z_0:  "<<controller->getParam("z_0")<< std::endl;
                    break;
+        case 'g' : controller->increaseGamma(-0.1);
+                   std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
+                   break;
+        case 'G' : controller->increaseGamma(0.1);
+                   std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
+                   break;
+	case 'b' : controller->setRandomPhi(); break;
+	case 'n' : controller->setRandomU(); break;
+	case 'm' : controller->setRandomX(10.); break;
         default:
                 return false;
                 break;

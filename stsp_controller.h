@@ -23,6 +23,14 @@ public:
   virtual void stepNoLearning(const sensor* , int number_sensors,
                               motor* , int number_motors);
 
+  void setRandomPhi();
+  void setRandomU();
+  void setRandomX( double size );
+
+  void increaseGamma( double size ){ gamma += size; };
+  void increaseW( double size ){ w_0 += size; };
+  void increaseZ( double size ){ z_0 += size; };
+  void increaseA( double size ){ a += size; };
 
   /********* STORABLE INTERFACE ******/
   /// @see Storable
@@ -76,7 +84,6 @@ protected:
 	 double u_new;
 	 double phi_old;
 	 double phi_new;
-	 //double x_a;  
   };
   std::vector<Neuron> neuron;
 

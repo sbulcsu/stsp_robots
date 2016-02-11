@@ -15,8 +15,6 @@ using namespace lpzrobots;
 STSPController::STSPController(const OdeConfig& odeconfig, double diameter, double prange ) 
   : AbstractController("STPController", "1.0"), odeconfig(odeconfig)
   {
-   number_sensors = 0;
-   number_motors = 0;
    radius = diameter/2.; 
    pendularrange = prange; 
 };
@@ -30,11 +28,11 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
      addParameterDef("b", &b, 0);   
      addParameterDef("r", &r, 1., "scaling factor of the sigmoidal function (<=1)");
      addParameterDef("w_0", &w_0, 10., "");
-     addParameterDef("z_0", &z_0, -30., "");
+     addParameterDef("z_0", &z_0, -20., "");
      addParameterDef("T_u", &T_u, 0.3, "");
      addParameterDef("T_phi", &T_phi, 0.6, "");
      addParameterDef("U_max", &U_max, 1., "");
-     addParameterDef("gamma", &gamma, 10, "");
+     addParameterDef("gamma", &gamma, 1, "");
 
      neuron.resize(number_motors);
      for(int i = 0; i<number_motors; i++){
@@ -106,6 +104,37 @@ double STSPController::mtarget(double y){
 double STSPController::mtargetInv(double sensor){
        return sensor/(r*2) + 0.5 ;
 };
+
+void STSPController::setRandomPhi(){
+     srand(time(0));
+     cout << " Changes of phi of each Neuron :   ";
+     for( int i=0; i < number_motors ; i++){ 
+	  neuron[i].phi_old = (double)rand()/(double)RAND_MAX;
+	  cout << neuron[i].phi_old << "   ";
+     }
+     cout << endl;
+};
+
+void STSPController::setRandomU(){
+     srand(time(0));
+     cout << " Changes of u of each Neuron :   ";
+     for( int i=0; i < number_motors ; i++){ 
+	  neuron[i].u_old = (double)rand()/(double)RAND_MAX* ( U_max- 1.)+ 1.;
+	  cout << neuron[i].u_old << "   ";
+     }
+     cout << endl;
+};
+
+void STSPController::setRandomX(double size){
+     srand(time(0));
+     cout << " Changes of x of each Neuron :   ";
+     for( int i=0; i < number_motors ; i++){ 
+	  neuron[i].x_old = (double)rand()/(double)RAND_MAX* size - size / 2.;
+	  cout << neuron[i].x_old << "   ";
+     }
+     cout << endl;
+};
+
 
 void STSPController::stepNoLearning(const sensor* sensors, int number_sensors,
                                     motor* motors, int number_motors) {
