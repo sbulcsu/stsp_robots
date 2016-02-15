@@ -23,6 +23,7 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
      number_sensors = sensornumber;
      number_motors = motornumber;
      cout<< " Number of motors: "  << number_motors << endl;
+     cout<< " Number of sensors: "  << number_sensors << endl;
 
      addParameterDef("a", &a, 0.4);
      addParameterDef("b", &b, 0);   
