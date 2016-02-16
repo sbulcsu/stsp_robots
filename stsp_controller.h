@@ -9,7 +9,7 @@ class STSPController : public AbstractController {
 public:
 
 
-  STSPController(const lpzrobots::OdeConfig& odeconfig, double diameter, double prange ); 
+  STSPController(const lpzrobots::OdeConfig& odeconfig );
 
   virtual void init(int sensornumber, int motornumber, RandGen* randGen = 0);
 
@@ -62,8 +62,6 @@ protected:
 
   int number_sensors;
   int number_motors;
-  double radius;     
-  double pendularrange; 
 
   double w_0;
   double z_0;

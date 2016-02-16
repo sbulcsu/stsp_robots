@@ -44,7 +44,7 @@ namespace lpzrobots {
       numberaxis(axes_number)
   {
        created = false;
-       objects.resize(1+numberaxis);   
+       objects.resize(1+numberaxis);   //+1 because of base
        joints.resize(numberaxis);
        memset(axis, 0, sizeof(void*) * numberaxis); 
        memset(servo, 0, sizeof(void*) * numberaxis);

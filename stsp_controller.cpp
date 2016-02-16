@@ -12,11 +12,10 @@
 using namespace std;
 using namespace lpzrobots;
 
-STSPController::STSPController(const OdeConfig& odeconfig, double diameter, double prange ) 
+STSPController::STSPController(const OdeConfig& odeconfig) 
   : AbstractController("STPController", "1.0"), odeconfig(odeconfig)
   {
-   radius = diameter/2.; 
-   pendularrange = prange; 
+
 };
 
 void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){

@@ -67,7 +67,7 @@ public:
        robot->place (osg::Matrix::rotate(M_PI/2, 1,0,0)*osg::Matrix::translate(0,0,0.3)); 
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Translational ),Attachment(-1));
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Rotational ),Attachment(-1));
-       controller = new STSPController( global.odeConfig, conf.diameter, conf.pendularrange );
+       controller = new STSPController( global.odeConfig );
        One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1) );
        agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
@@ -86,7 +86,7 @@ public:
        robot = new SphereRobot( odeHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
        robot->place(osg::Matrix::translate(0,0,0.3));
-       controller = new STSPController( global.odeConfig, sconf.diameter, sconf.pendularrange);
+       controller = new STSPController( global.odeConfig );
        One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1));
        agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
