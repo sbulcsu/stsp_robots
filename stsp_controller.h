@@ -26,6 +26,7 @@ public:
   void setRandomPhi();
   void setRandomU();
   void setRandomX( double size );
+  void setRandomAll(double size);
 
   void increaseGamma( double size ){ gamma += size; };
   void increaseW( double size ){ w_0 += size; };

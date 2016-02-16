@@ -154,6 +154,7 @@ public:
 	case 'b' : controller->setRandomPhi(); break;
 	case 'n' : controller->setRandomU(); break;
 	case 'm' : controller->setRandomX(10.); break;
+	case 'r' : controller->setRandomAll(10.); break;
         default:
                 return false;
                 break;

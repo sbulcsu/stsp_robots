@@ -52,7 +52,7 @@ namespace lpzrobots {
    
        addParameter("pendularmass",&this->conf.pendularmass, "mass of the slider");
        addParameter("motorpower", &this->conf.motorpowerfactor, 
-		    "power of PDcontroller = motorpower*pendularmass ");
+		    "K_p parameter of PD controller = motorpower*pendularmass ");
        addParameter("pendularrange",&this->conf.pendularrange,   
 		    "range of the masses along the sliders");
   }
@@ -164,15 +164,17 @@ namespace lpzrobots {
          joints[n] = new SliderJoint(objects[Base], pendular[n],
                                     p, Axis((n==0), (n==1), (n==2))*pose);
          joints[n]->init(odeHandle, osgHandle, false);
-         joints[n]->setParam ( dParamStopCFM, 0.1);
-         joints[n]->setParam ( dParamStopERP, 0.9);
-         joints[n]->setParam ( dParamCFM, 0.001);
+	 //the following 3 parameters are for the potential 
+	 //to keep the pendulars dynamics within certain limits, not used since 'dInfinity'
+         //joints[n]->setParam ( dParamStopCFM, 0.1);
+         //joints[n]->setParam ( dParamStopERP, 0.9);
+         //joints[n]->setParam ( dParamCFM, 0.001);
          servo[n] = new SliderServo(dynamic_cast<OneAxisJoint*>(joints[n]),
-				    -0.5*conf.diameter*conf.pendularrange,
-				    0.5*conf.diameter*conf.pendularrange,
-				    conf.pendularmass*conf.motorpowerfactor,
-				    sqrt(4/conf.motorpowerfactor),
-				    0, 100, dInfinity);
+				    -0.5*conf.diameter*conf.pendularrange, //_min
+				    0.5*conf.diameter*conf.pendularrange, //_max
+				    conf.pendularmass*conf.motorpowerfactor, //K_p
+				    sqrt(4/conf.motorpowerfactor), //K_d
+				    0, 100, dInfinity); //K_i, maxVel, maxLim?
          axis[n] = new OSGCylinder( conf.diameter/100, conf.diameter-conf.diameter/100);
          axis[n]->init( osgHandleX[n], OSGPrimitive::Low );
          axisdots[n] = new OSGSphere( conf.pendulardiameter/3 );
