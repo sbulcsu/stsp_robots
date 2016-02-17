@@ -155,6 +155,7 @@ public:
 	case 'n' : controller->setRandomU(); break;
 	case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
+	case 't' : robot->moveToPosition(); break;
         default:
                 return false;
                 break;
