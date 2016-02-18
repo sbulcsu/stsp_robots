@@ -50,6 +50,9 @@ public:
     setCameraMode(Follow);            //Follow, Race or Static
     //setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
     setCameraHomePos(Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0));
+    setCameraHomePos(Pos(-1.73692, 2.35209, -0.0248705),  Pos(-137.893, 9.56433, 0));
+    setCameraHomePos(Pos(-1.23623, 3.07594, 0.00840396),  Pos(-149.421, 6.38959, 0));
+
 
 
     /*********** ROBOTS  **********/
@@ -82,8 +85,11 @@ public:
        SphereRobotConf sconf = SphereRobot::getDefaultConf();
        sconf.diameter = 0.5;
        sconf.motorpowerfactor = 120;
-
-       robot = new SphereRobot( odeHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", 0.4);
+       // to change the substance/material of the robot. be careful: material influences the behaviour
+       OdeHandle myHandle = odeHandle;    // default: plastic with roughness= 0.8
+       myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
+       //myHandle.substance.toRubber(50); // hardness [5,50], high roughness, no slip, very elastic
+       robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
        robot->place(osg::Matrix::translate(0,0,0.3));
        controller = new STSPController( global.odeConfig );
