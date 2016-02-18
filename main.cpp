@@ -94,7 +94,11 @@ public:
        global.configs.push_back( controller );
        global.configs.push_back( robot );
     }
-    if(track == true)  agent->setTrackOptions(TrackRobot(false, false, false, true, "ZSens", 50));
+    // tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval )
+    // if 1 of the first 3 arguments  == ture:  log file with values is created 
+    TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
+    TrackOpt->conf.displayTraceDur = 10650; //length of track line
+    if(track == true)  agent->setTrackOptions( *TrackOpt );
   };
 
 
@@ -151,11 +155,13 @@ public:
         case 'G' : controller->increaseGamma(0.1);
                    std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
                    break;
-	case 'b' : controller->setRandomPhi(); break;
-	case 'n' : controller->setRandomU(); break;
-	case 'm' : controller->setRandomX(10.); break;
+	//case 'b' : controller->setRandomPhi(); break;
+	//case 'n' : controller->setRandomU(); break;
+	//case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
-	case 't' : robot->moveToPosition(); break;
+	case 'm' : robot->moveToPosition(Pos(0,0,0.25)); break;
+        case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
+                   std::cout<< "track file: open or close " << std::endl; break;
         default:
                 return false;
                 break;
