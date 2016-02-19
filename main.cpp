@@ -50,8 +50,8 @@ public:
     setCameraMode(Follow);            //Follow, Race or Static
     //setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
     setCameraHomePos(Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0));
-    setCameraHomePos(Pos(-1.73692, 2.35209, -0.0248705),  Pos(-137.893, 9.56433, 0));
-    setCameraHomePos(Pos(-1.23623, 3.07594, 0.00840396),  Pos(-149.421, 6.38959, 0));
+    //setCameraHomePos(Pos(-1.73692, 2.35209, -0.0248705),  Pos(-137.893, 9.56433, 0));
+    //setCameraHomePos(Pos(-1.23623, 3.07594, 0.00840396),  Pos(-149.421, 6.38959, 0));
 
 
 
@@ -89,7 +89,7 @@ public:
        OdeHandle myHandle = odeHandle;    // default: plastic with roughness= 0.8
        myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
        //myHandle.substance.toRubber(50); // hardness [5,50], high roughness, no slip, very elastic
-       robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", 0.4);
+       robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", global.odeConfig, 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
        robot->place(osg::Matrix::translate(0,0,0.3));
        controller = new STSPController( global.odeConfig );
@@ -166,6 +166,7 @@ public:
 	//case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
 	case 'm' : robot->moveToPosition(Pos(0,0,0.25)); break;
+	//case 'M' : robot->moveToPose(Pos(0,0,0.25)); break; // funktioniert noch nicht richtig
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
                    std::cout<< "track file: open or close " << std::endl; break;
         default:
