@@ -48,10 +48,9 @@ namespace lpzrobots {
        vMeanY = 0;
        vMeanZ = 0;
        vMeanXY = 0;
-       stepsize = 0.01;
+       stepsize = odeconfig.simStepSize;
        addParameter("T_ave",&this->T_ave, "Timescale of the trailing speed average");
-       speedsensors = false;
-       if( speedsensors == true) number_speedsensors = 4;
+       if( conf.ave_speedsensors == true) number_speedsensors = 4;
        else number_speedsensors = 0; 
 
        created = false;
@@ -106,7 +105,7 @@ namespace lpzrobots {
           sensors[len] = servo[n]->get()* conf.pendularrange* 0.5*  conf.diameter;
           len++; 
       }
-      if(speedsensors == true){
+      if(conf.ave_speedsensors == true){
 	 stepsize = odeconfig.simStepSize;
 	 Pos vel = getSpeed();
          vMeanX += (vel[0] - vMeanX)* stepsize / T_ave;

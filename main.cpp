@@ -89,7 +89,8 @@ public:
        OdeHandle myHandle = odeHandle;    // default: plastic with roughness= 0.8
        myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
        //myHandle.substance.toRubber(50); // hardness [5,50], high roughness, no slip, very elastic
-       robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, "Sphere", global.odeConfig, 0.4);
+       robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, 
+				"Sphere", global.odeConfig, 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
        robot->place(osg::Matrix::translate(0,0,0.3));
        controller = new STSPController( global.odeConfig );

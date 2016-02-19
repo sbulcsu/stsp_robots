@@ -43,6 +43,7 @@ public:
     double motorpowerfactor; 
     double pendularrange;  
     double axesShift; 
+    bool ave_speedsensors;
 } SphereRobotConf;
 
 
@@ -57,6 +58,7 @@ public:
           c.pendularrange	= 0.5; 
           c.motorpowerfactor 	= 120; 
           c.axesShift		= 0;
+          c.ave_speedsensors	= true;
           return c;
   } 
   SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
@@ -89,7 +91,6 @@ protected:
 
   // Sensors for averaged speed in x, y, z, xy, ?xyz?
   const OdeConfig& odeconfig;
-  bool speedsensors;
   double vMeanX;
   double vMeanY;
   double vMeanZ;
