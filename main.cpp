@@ -1,8 +1,9 @@
 #include <ode_robots/simulation.h>
 #include <ode_robots/odeagent.h>
-//#include <ode_robots/playground.h>
-//#include <ode_robots/octaplayground.h>
-//#include <ode_robots/terrainground.h>
+#include <ode_robots/playground.h>
+#include <ode_robots/octaplayground.h>
+#include <ode_robots/terrainground.h>
+#include <ode_robots/meshground.h>
 //#include <ode_robots/passivesphere.h>
 //#include <ode_robots/passivebox.h>
 #include <selforg/noisegenerator.h>
@@ -27,9 +28,14 @@ public:
   OdeRobot* robot;
   double friction;
   bool track = true; 
+  Pos RobInitPos;
 
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
+
+  enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
+  Env env = NO;
+
 
   ThisSim(){
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -46,13 +52,9 @@ public:
     global.odeConfig.setParam("simstepsize", 0.01);
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
     
-    /********** CAMERA **********/
-    setCameraMode(Follow);            //Follow, Race or Static
-    //setCameraHomePos(Pos(-0.535584, 13.4922, 6.79505),  Pos(-177.933, -25.1901, 0));
-    setCameraHomePos(Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0));
-    //setCameraHomePos(Pos(-1.73692, 2.35209, -0.0248705),  Pos(-137.893, 9.56433, 0));
-    //setCameraHomePos(Pos(-1.23623, 3.07594, 0.00840396),  Pos(-149.421, 6.38959, 0));
 
+    /********** ENVIRONMENT **********/
+    createEnv( odeHandle, osgHandle, global, env );
 
 
     /*********** ROBOTS  **********/
@@ -67,7 +69,7 @@ public:
        conf.motorsensor=true;           
        robot = new BarrelRobot(odeHandle, osgHandle.changeColor(Color(0.0,0.0,1.0)),
                                conf, "Barrel", 0.4, 2); 
-       robot->place (osg::Matrix::rotate(M_PI/2, 1,0,0)*osg::Matrix::translate(0,0,0.3)); 
+       robot->place (osg::Matrix::rotate(M_PI/2, 1,0,0)*osg::Matrix::translate(0,0,10)); 
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Translational ),Attachment(-1));
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Rotational ),Attachment(-1));
        controller = new STSPController( global.odeConfig );
@@ -92,7 +94,8 @@ public:
        robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, 
 				"Sphere", global.odeConfig, 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
-       robot->place(osg::Matrix::translate(0,0,0.3));
+       //robot->place(osg::Matrix::translate(0,0,0.3));
+       robot->place(RobInitPos);
        controller = new STSPController( global.odeConfig );
        One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1));
        agent = new OdeAgent( globalData );
@@ -122,6 +125,152 @@ public:
   }
 
 
+
+  void createEnv( const OdeHandle& odeHandle, const OsgHandle& osgHandle, 
+		  GlobalData& global, Env environment ){
+    switch(environment){
+    case NO: {
+	setCameraMode( Follow );            //Follow, Race or Static
+	setCameraHomePos( Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0) );
+	RobInitPos = Pos(0,0,0);
+	} break;
+    case PG: {
+	Playground* world = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, true);
+	world->setPosition( osg::Vec3(0,0,2) );
+	global.obstacles.push_back( world );
+	setCameraMode( Static );            //Follow, Race or Static
+	setCameraHomePos(Pos(3.77046, 29.2309, 36.8821),  Pos(173.891, -53.7632, 0));
+	RobInitPos = Pos(0,0,2);
+	} break;
+    case OP: {  //Pos( radius, width of wall, hight of wall), bool: has its own ground or not
+	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(15,0.2,0.5), 15, true);
+	world->setPose( osg::Matrix::translate(0,0,2) );
+	global.obstacles.push_back( world );
+	setCameraMode( Static );
+	setCameraHomePos(Pos(-37.9599, -9.93542, 23.9097),  Pos(-74.8937, -34.2922, 0));
+	RobInitPos = Pos(0,0,2);
+	} break;  
+     case TI: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/terrain_bumpInDip128.ppm", 
+        				"Images/stripes.rgb", 30, 30, 4,
+					OSGHeightField::Sum);
+	world->setPose( osg::Matrix::translate(0,0,0.1) ); 
+	global.obstacles.push_back( world );
+	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,4);
+	} break;
+     case RU: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/threedips128.ppm", 
+        				"terrains/threedips128.ppm", 28, 28, 5,
+					OSGHeightField::Sum);
+	world->setPose( osg::Matrix::translate(0,0,0.1) ); 
+	global.obstacles.push_back( world );
+	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,4);
+	} break;
+     case PLA: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/plateau32.ppm", 
+        				"terrains/dip128_flat_texture.ppm", 28, 28, 4,
+					OSGHeightField::Sum);
+	world->setPose( osg::Matrix::translate(0,0,0.1) ); //*osg::Matrix::rotate(M_PI, 1,0,0));
+	global.obstacles.push_back( world );
+	setCameraHomePos(Pos(-3.50842, 35.7864, 39.3782),  Pos(-173.715, -46.8176, 0));
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,4);
+	} break;
+     case ELF: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/dip128_flat.ppm", 
+        				"terrains/dip128_flat_texture.ppm", 50, 50, 8,
+					OSGHeightField::Sum);
+	world->setPose( osg::Matrix::translate(0,0,0.1) ); //*osg::Matrix::rotate(M_PI, 1,0,0));
+	global.obstacles.push_back( world );
+	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,0.2);
+	} break;
+     case EL: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/dip128.ppm", 
+        				"terrains/dip128_texture.ppm", 20,20,3,  // 2, 2, 0.5,
+					OSGHeightField::Red);
+	world->setPose( osg::Matrix::translate(0,0,0.2) ); //*osg::Matrix::rotate(M_PI, 1,0,0));
+	global.obstacles.push_back( world );
+	setCameraHomePos(Pos(3.4179, 22.6125, 21.7825),  Pos(172.786, -44.2672, 0));
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,0.2);
+	} break;
+     case PT: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/3potential.ppm", 
+        				"terrains/3potential_texture.ppm", 20, 20, 2); //120, 120, 5);
+	world->setPose( osg::Matrix::translate(0,0,1) ); //*osg::Matrix::rotate(M_PI, 1,0,0));
+	global.obstacles.push_back( world );
+	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,3);
+	} break;
+     case TB: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/threebumps.ppm", 
+        				//"terrains/threebumps.ppm", 20, 20, 2,
+        				"Images/stripes.rgb", 20, 20, 2,
+					OSGHeightField::Sum);
+	world->setPose( osg::Matrix::translate(0,0,1) ); //*osg::Matrix::rotate(M_PI, 1,0,0));
+	global.obstacles.push_back( world );
+	TerrainGround* world1 = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/threebumps.ppm", 
+        				"Images/stripes.rgb", 20, 20, 2,
+					OSGHeightField::Red);
+	world1->setPose( osg::Matrix::translate(20,0,1) *osg::Matrix::rotate(0, 0, M_PI/4, 0));
+	global.obstacles.push_back( world1 );
+	TerrainGround* world2 = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/threebumps.ppm", 
+        				"Images/stripes.rgb", 20, 20, 2,
+					OSGHeightField::Red);
+	world2->setPose( osg::Matrix::translate(0,20,1) *osg::Matrix::rotate(0, 0, 0, 0));
+	global.obstacles.push_back( world2 );
+	TerrainGround* world3 = new TerrainGround( odeHandle, osgHandle, 
+        				"terrains/threebumps.ppm", 
+        				"Images/stripes.rgb", 20, 20, 2,
+					OSGHeightField::Red);
+	world3->setPose( osg::Matrix::translate(20,20,1) *osg::Matrix::rotate(0, 0, 0, 0));
+	global.obstacles.push_back( world3);
+	setCameraHomePos(Pos(8.20536, 62.9326, 51.9464),  Pos(-179.292, -45.7944, 0));
+	setCameraMode( Static );
+	RobInitPos = Pos(0,0,3);
+	} break;
+     case HG: {
+	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
+        				//---"terrains/macrospheresLMH_256.ppm", 
+        				//---"terrains/macrospheresLMH_256.ppm", 128, 128, 3,
+        				//"terrains/rauschen32.ppm",  // not tough
+        				//"terrains/rauschen32.ppm", 128, 128, 3,
+        				"terrains/whirl32.ppm", 
+        				"terrains/whirl32.ppm", 128, 128, 3,
+        				//"terrains/zoo_landscape2.ppm", 
+        				//"terrains/zoo_landscape2.ppm", 128, 128, 3,
+					OSGHeightField::Sum);
+	world->setPose( osg::Matrix::translate(0,0,0.1) ); 
+	global.obstacles.push_back( world );
+	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	setCameraMode( Static );
+	} break;
+//    case MG: {
+//	MeshGround* world4 = new MeshGround(odeHandle, osgHandle,
+//		"terrains/dip3_128.ppm" , "terrains/dip3_128.ppm"   , 7, 7, 0.3 );
+//	world4->setPose(osg::Matrix::translate(0,0,0));
+//	global.obstacles.push_back(world4);
+//	}
+//	break;
+    }
+
+  }
 
   
   virtual bool command(const OdeHandle&, const OsgHandle&, GlobalData& globalData, int key, bool down){
@@ -166,8 +315,7 @@ public:
 	//case 'n' : controller->setRandomU(); break;
 	//case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
-	case 'm' : robot->moveToPosition(Pos(0,0,0.25)); break;
-	//case 'M' : robot->moveToPose(Pos(0,0,0.25)); break; // funktioniert noch nicht richtig
+	case 'm' : robot->moveToPosition(Pos(0,0,10.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
                    std::cout<< "track file: open or close " << std::endl; break;
         default:
