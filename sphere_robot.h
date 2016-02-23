@@ -43,6 +43,7 @@ public:
     double motorpowerfactor; 
     double pendularrange;  
     double axesShift; 
+    bool ave_speedsensors;
 } SphereRobotConf;
 
 
@@ -57,18 +58,20 @@ public:
           c.pendularrange	= 0.5; 
           c.motorpowerfactor 	= 120; 
           c.axesShift		= 0;
+          c.ave_speedsensors	= true;
           return c;
   } 
   SphereRobot ( const OdeHandle& odeHandle, const OsgHandle& osgHandle,
                 const SphereRobotConf& conf, const std::string& name, 
-		double transparency=0.5, unsigned int axes_number=3 );
+		const OdeConfig& odeconfig, double transparency=0.5, 
+		unsigned int axes_number=3 );
   ~SphereRobot();
   void update(); // update ODE and OSG parts
   void placeIntern( const osg::Matrix& pose ); // set Pos of robot when constructing
   int getSensorsIntern( sensor* sensors, int sensornumber ); // for specific sensor handling
   void setMotorsIntern( const double* motors, int motornumber );
   int getMotorNumberIntern(){ return numberaxis; }; 
-  int getSensorNumberIntern(){ return 2*numberaxis; }; // number of sensors, to set size of sensor list  
+  int getSensorNumberIntern(){ return 2*numberaxis + number_speedsensors; }; // number of sensors, to set size of sensor list  
   void notifyOnChange( const paramkey& key );
   enum parts { Base, Pendular1, Pendular2, Pendular3, Last };
 
@@ -86,6 +89,15 @@ protected:
   bool created;
 
 
+  // Sensors for averaged speed in x, y, z, xy, ?xyz?
+  const OdeConfig& odeconfig;
+  double vMeanX;
+  double vMeanY;
+  double vMeanZ;
+  double vMeanXY;
+  double T_ave = 10000;
+  double stepsize;
+  unsigned int number_speedsensors;
 };
 
 }

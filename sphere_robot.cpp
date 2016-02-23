@@ -39,10 +39,20 @@ namespace lpzrobots {
                             const OsgHandle& osgHandle,
                             const SphereRobotConf& conf,
                             const std::string& name,
+			    const OdeConfig& odeconfig, 
                             double transparency, unsigned int axes_number)
     : OdeRobot( odeHandle, osgHandle, name,"$Id$"), conf(conf), transparency(transparency),
-      numberaxis(axes_number)
+      numberaxis(axes_number), odeconfig(odeconfig)
   {
+       vMeanX = 0;
+       vMeanY = 0;
+       vMeanZ = 0;
+       vMeanXY = 0;
+       stepsize = odeconfig.simStepSize;
+       addParameter("T_ave",&this->T_ave, "Timescale of the trailing speed average");
+       if( conf.ave_speedsensors == true) number_speedsensors = 4;
+       else number_speedsensors = 0; 
+
        created = false;
        objects.resize(1+numberaxis);   //+1 because of base
        joints.resize(numberaxis);
@@ -94,6 +104,23 @@ namespace lpzrobots {
       for(unsigned int n = 0; n< numberaxis; n++){
           sensors[len] = servo[n]->get()* conf.pendularrange* 0.5*  conf.diameter;
           len++; 
+      }
+      if(conf.ave_speedsensors == true){
+	 stepsize = odeconfig.simStepSize;
+	 Pos vel = getSpeed();
+         vMeanX += (vel[0] - vMeanX)* stepsize / T_ave;
+         sensors[len] = vMeanX;
+	 len++;
+         vMeanY += (vel[1] - vMeanY)* stepsize / T_ave;
+         sensors[len] = vMeanY;
+	 len++;
+         vMeanZ += (vel[2] - vMeanZ)* stepsize / T_ave;
+         sensors[len] = vMeanZ;
+	 len++;
+         //vMeanXY += ( sqrt( pow(vel[0],2) + pow(vel[1],2)) -vMeanXY)* stepsize / T_ave ;
+         vMeanXY += ( sqrt( pow(vMeanX,2) + pow(vMeanY,2)) -vMeanXY)* stepsize / T_ave ;
+	 sensors[len] = vMeanXY;
+	 len++;
       }
       return len;
   }
