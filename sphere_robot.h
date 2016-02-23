@@ -89,12 +89,12 @@ protected:
   bool created;
 
 
-  // Sensors for averaged speed in x, y, z, xy, ?xyz?
+  // Sensors for averaged speed in x, y, z, xyz
   const OdeConfig& odeconfig;
   double vMeanX;
   double vMeanY;
   double vMeanZ;
-  double vMeanXY;
+  double vMean;
   double T_ave = 10000;
   double stepsize;
   unsigned int number_speedsensors;

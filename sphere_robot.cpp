@@ -47,9 +47,8 @@ namespace lpzrobots {
        vMeanX = 0;
        vMeanY = 0;
        vMeanZ = 0;
-       vMeanXY = 0;
+       vMean = 0;
        stepsize = odeconfig.simStepSize;
-       addParameter("T_ave",&this->T_ave, "Timescale of the trailing speed average");
        if( conf.ave_speedsensors == true) number_speedsensors = 4;
        else number_speedsensors = 0; 
 
@@ -65,6 +64,7 @@ namespace lpzrobots {
 		    "K_p parameter of PD controller = motorpower*pendularmass ");
        addParameter("pendularrange",&this->conf.pendularrange,   
 		    "range of the masses along the sliders");
+       addParameter("T_ave",&this->T_ave, "Timescale of the trailing speed average");
   }
 /********************/
   SphereRobot::~SphereRobot(){
@@ -117,9 +117,8 @@ namespace lpzrobots {
          vMeanZ += (vel[2] - vMeanZ)* stepsize / T_ave;
          sensors[len] = vMeanZ;
 	 len++;
-         //vMeanXY += ( sqrt( pow(vel[0],2) + pow(vel[1],2)) -vMeanXY)* stepsize / T_ave ;
-         vMeanXY += ( sqrt( pow(vMeanX,2) + pow(vMeanY,2)) -vMeanXY)* stepsize / T_ave ;
-	 sensors[len] = vMeanXY;
+         vMean += ( sqrt(pow(vel[0],2)+pow(vel[1],2)+pow(vel[2],2)) -vMean)* stepsize / T_ave;
+	 sensors[len] = vMean;
 	 len++;
       }
       return len;
