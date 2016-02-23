@@ -36,12 +36,23 @@ public:
   enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
   Env env = NO;
 
+  //The default values of substance is defined in odeHandle.substance
+  //odeHandle Substance: roughness:  0.8
+  //			 slip:	     0.01
+  //			 hardness:   40
+  //			 elasticity: 0.5
 
-  ThisSim(){
+
+  ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
     addColorAliasFile("colors/UrbanColorSchema.txt");
     addColorAliasFile("colors.txt");
-    setGroundTexture("Images/whiteground.jpg");\
+    setGroundTexture("Images/whiteground.jpg");
+    //Substance GroundSub = getGroundSubstance(); //changing with setGroundSubstance( substance )
+    //std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
+    //std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
+    //std::cout << "			 hardness:   " << GroundSub.hardness << std::endl;
+    //std::cout << "			 elasticity: " << GroundSub.elasticity << std::endl;
   }
 
   void start(const OdeHandle& odeHandle, const OsgHandle& osgHandle, GlobalData& global){
@@ -51,11 +62,9 @@ public:
     global.odeConfig.setParam("realtimefactor",1);
     global.odeConfig.setParam("simstepsize", 0.01);
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
-    
 
     /********** ENVIRONMENT **********/
     createEnv( odeHandle, osgHandle, global, env );
-
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -107,7 +116,7 @@ public:
     // tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval )
     // if 1 of the first 3 arguments  == ture:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    TrackOpt->conf.displayTraceDur = 10650; //length of track line
+    TrackOpt->conf.displayTraceDur = 10000; //length of track line
     if(track == true)  agent->setTrackOptions( *TrackOpt );
   };
 
@@ -130,19 +139,19 @@ public:
 		  GlobalData& global, Env environment ){
     switch(environment){
     case NO: {
-	setCameraMode( Follow );            //Follow, Race or Static
+	setCameraMode( Follow );        
 	setCameraHomePos( Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0) );
 	RobInitPos = Pos(0,0,0);
 	} break;
-    case PG: {
+    case PG: {  //Pos( radius, width of wall, hight of wall), bool: has its own ground or not
 	Playground* world = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, true);
 	world->setPosition( osg::Vec3(0,0,2) );
 	global.obstacles.push_back( world );
-	setCameraMode( Static );            //Follow, Race or Static
+	setCameraMode( Static );       
 	setCameraHomePos(Pos(3.77046, 29.2309, 36.8821),  Pos(173.891, -53.7632, 0));
 	RobInitPos = Pos(0,0,2);
 	} break;
-    case OP: {  //Pos( radius, width of wall, hight of wall), bool: has its own ground or not
+    case OP: { 
 	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(15,0.2,0.5), 15, true);
 	world->setPose( osg::Matrix::translate(0,0,2) );
 	global.obstacles.push_back( world );
@@ -261,13 +270,6 @@ public:
 	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
 	setCameraMode( Static );
 	} break;
-//    case MG: {
-//	MeshGround* world4 = new MeshGround(odeHandle, osgHandle,
-//		"terrains/dip3_128.ppm" , "terrains/dip3_128.ppm"   , 7, 7, 0.3 );
-//	world4->setPose(osg::Matrix::translate(0,0,0));
-//	global.obstacles.push_back(world4);
-//	}
-//	break;
     }
 
   }
