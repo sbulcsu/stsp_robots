@@ -44,12 +44,10 @@ namespace lpzrobots {
     : OdeRobot( odeHandle, osgHandle, name,"$Id$"), conf(conf), transparency(transparency),
       numberaxis(axes_number), odeconfig(odeconfig)
   {
-       vMeanX = 0;
-       vMeanY = 0;
-       vMeanZ = 0;
-       vMean = 0;
+       vMean = osg::Vec3(0,0,0);
+       vMeanTot = 0;
        stepsize = odeconfig.simStepSize;
-       if( conf.ave_speedsensors == true) number_speedsensors = 4;
+       if( conf.ave_speedsensors == true) number_speedsensors = 5;
        else number_speedsensors = 0; 
 
        created = false;
@@ -108,20 +106,25 @@ namespace lpzrobots {
       if(conf.ave_speedsensors == true){
 	 stepsize = odeconfig.simStepSize;
 	 Pos vel = getSpeed();
-         vMeanX += (vel[0] - vMeanX)* stepsize / T_ave;
-         sensors[len] = vMeanX;
+	 trailingAverage( vel );
+         for(int i=0; i<3; i++){
+	     sensors[len] = vMean[i];
+	     len++;
+	 }
+         vMeanTot2 += ( sqrt(pow(vel[0],2)+pow(vel[1],2)+pow(vel[2],2)) -vMeanTot2)* stepsize / T_ave;
+	 sensors[len] = vMeanTot2;
 	 len++;
-         vMeanY += (vel[1] - vMeanY)* stepsize / T_ave;
-         sensors[len] = vMeanY;
-	 len++;
-         vMeanZ += (vel[2] - vMeanZ)* stepsize / T_ave;
-         sensors[len] = vMeanZ;
-	 len++;
-         vMean += ( sqrt(pow(vel[0],2)+pow(vel[1],2)+pow(vel[2],2)) -vMean)* stepsize / T_ave;
-	 sensors[len] = vMean;
+	 vMeanTot = sqrt( pow(vMean[0],2) + pow(vMean[1],2) + pow(vMean[2],2) );
+	 sensors[len] = vMeanTot;
 	 len++;
       }
       return len;
+  }
+/********************/
+  void SphereRobot::trailingAverage( Pos vel){
+      for( int i=0 ; i<3; i++){
+	   vMean[i] += (vel[i] - vMean[i])*stepsize / T_ave;
+	 }
   }
 /********************/
   void SphereRobot::setMotorsIntern( const double* motors, int motornumber ) {

@@ -32,16 +32,26 @@ public:
 
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
-
+  
+  //Environments: NO: flat ground
+  //		  PG: playground fenced by a wall
+  //		  HG: 
+  //		  OP: polygonal playground fenced by a wall
+  //		  TB: three basins 
+  //		  PT: three potentials different depth
+  //		  EL: round or elliptical potential
+  //		  ELF: same but different shape
+  //		  PLA: plateau
+  //		  TI: trench
+  //		  RU: 3 little trenchs
   enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = NO;
+  Env env = RU;
 
   //The default values of substance is defined in odeHandle.substance
   //odeHandle Substance: roughness:  0.8
   //			 slip:	     0.01
   //			 hardness:   40
   //			 elasticity: 0.5
-
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -98,7 +108,7 @@ public:
        sconf.motorpowerfactor = 120;
        // to change the substance/material of the robot. be careful: material influences the behaviour
        OdeHandle myHandle = odeHandle;    // default: plastic with roughness= 0.8
-       myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
+       //myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
        //myHandle.substance.toRubber(50); // hardness [5,50], high roughness, no slip, very elastic
        robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, 
 				"Sphere", global.odeConfig, 0.4);
@@ -173,7 +183,7 @@ public:
      case RU: {
 	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
         				"terrains/threedips128.ppm", 
-        				"terrains/threedips128.ppm", 28, 28, 5,
+        				"Images/whiteground.jpg", 28, 28, 5,
 					OSGHeightField::Sum);
 	world->setPose( osg::Matrix::translate(0,0,0.1) ); 
 	global.obstacles.push_back( world );

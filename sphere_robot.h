@@ -73,6 +73,7 @@ public:
   int getMotorNumberIntern(){ return numberaxis; }; 
   int getSensorNumberIntern(){ return 2*numberaxis + number_speedsensors; }; // number of sensors, to set size of sensor list  
   void notifyOnChange( const paramkey& key );
+  void trailingAverage( Pos vel );
   enum parts { Base, Pendular1, Pendular2, Pendular3, Last };
 
 protected:
@@ -91,10 +92,9 @@ protected:
 
   // Sensors for averaged speed in x, y, z, xyz
   const OdeConfig& odeconfig;
-  double vMeanX;
-  double vMeanY;
-  double vMeanZ;
-  double vMean;
+  Pos vMean;
+  double vMeanTot;
+  double vMeanTot2;
   double T_ave = 10000;
   double stepsize;
   unsigned int number_speedsensors;
