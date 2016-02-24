@@ -47,7 +47,7 @@ namespace lpzrobots {
        vMean = osg::Vec3(0,0,0);
        vMeanTot = 0;
        stepsize = odeconfig.simStepSize;
-       if( conf.ave_speedsensors == true) number_speedsensors = 5;
+       if( conf.ave_speedsensors == true) number_speedsensors = 6;
        else number_speedsensors = 0; 
 
        created = false;
@@ -116,6 +116,8 @@ namespace lpzrobots {
 	 len++;
 	 vMeanTot = sqrt( pow(vMean[0],2) + pow(vMean[1],2) + pow(vMean[2],2) );
 	 sensors[len] = vMeanTot;
+	 len++;
+	 sensors[len] =sqrt( pow(vel[0],2) + pow(vel[1],2) + pow(vel[2],2) );  
 	 len++;
       }
       return len;

@@ -45,7 +45,7 @@ public:
   //		  TI: trench
   //		  RU: 3 little trenchs
   enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = RU;
+  Env env = NO;
 
   //The default values of substance is defined in odeHandle.substance
   //odeHandle Substance: roughness:  0.8
