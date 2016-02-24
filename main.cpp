@@ -45,7 +45,7 @@ public:
   //		  TI: trench
   //		  RU: 3 little trenchs
   enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = NO;
+  Env env = OP;
 
   //The default values of substance is defined in odeHandle.substance
   //odeHandle Substance: roughness:  0.8
@@ -162,8 +162,8 @@ public:
 	RobInitPos = Pos(0,0,2);
 	} break;
     case OP: { 
-	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(15,0.2,0.5), 15, true);
-	world->setPose( osg::Matrix::translate(0,0,2) );
+	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(15,0.2,0.5), 15, false);
+	world->setPose( osg::Matrix::translate(0,0,0) );
 	global.obstacles.push_back( world );
 	setCameraMode( Static );
 	setCameraHomePos(Pos(-37.9599, -9.93542, 23.9097),  Pos(-74.8937, -34.2922, 0));
