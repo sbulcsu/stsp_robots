@@ -95,7 +95,7 @@ protected:
   Pos vMean;
   double vMeanTot;
   double vMeanTot2;
-  double T_ave = 100;
+  double T_ave;
   double stepsize;
   unsigned int number_speedsensors;
 };

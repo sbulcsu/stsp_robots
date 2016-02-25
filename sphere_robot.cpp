@@ -63,7 +63,7 @@ namespace lpzrobots {
 		    "K_p parameter of PD controller = motorpower*pendularmass ");
        addParameter("pendularrange",&this->conf.pendularrange,   
 		    "range of the masses along the sliders");
-       addParameter("T_ave",&this->T_ave, "Timescale of the trailing speed average");
+       addParameterDef("T_ave",&this->T_ave, 100, "Timescale of the trailing speed average");
   }
 /********************/
   SphereRobot::~SphereRobot(){
