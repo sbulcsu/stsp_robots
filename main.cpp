@@ -12,6 +12,7 @@
 #include <ode_robots/axisorientationsensor.h>
 #include <ode_robots/speedsensor.h>
 #include <ode_robots/sensor.h>
+#include <ode_robots/primitive.h>
 
 #include "sphere_robot.h"
 #include "barrel_robot.h"
@@ -45,24 +46,13 @@ public:
   //		  TI: trench
   //		  RU: 3 little trenchs
   enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = OP;
-
-  //The default values of substance is defined in odeHandle.substance
-  //odeHandle Substance: roughness:  0.8
-  //			 slip:	     0.01
-  //			 hardness:   40
-  //			 elasticity: 0.5
+  Env env = NO;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
     addColorAliasFile("colors/UrbanColorSchema.txt");
     addColorAliasFile("colors.txt");
     setGroundTexture("Images/whiteground.jpg");
-    //Substance GroundSub = getGroundSubstance(); //changing with setGroundSubstance( substance )
-    //std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
-    //std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
-    //std::cout << "			 hardness:   " << GroundSub.hardness << std::endl;
-    //std::cout << "			 elasticity: " << GroundSub.elasticity << std::endl;
   }
 
   void start(const OdeHandle& odeHandle, const OsgHandle& osgHandle, GlobalData& global){
@@ -72,9 +62,27 @@ public:
     global.odeConfig.setParam("realtimefactor",1);
     global.odeConfig.setParam("simstepsize", 0.01);
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
+    //The default values of substance is defined in odeHandle.substance
+    //odeHandle Substance: roughness:  0.8
+    //			 slip:	     0.01
+    //			 hardness:   40
+    //			 elasticity: 0.5
+    //Substance groundSubst = Substance::getMetal(0.01);
+    //setGroundSubstance( groundSubst );
+    Substance GroundSub = getGroundSubstance(); 
+    std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
+    std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
+    std::cout << "			 hardness:   " << GroundSub.hardness << std::endl;
+    std::cout << "			 elasticity: " << GroundSub.elasticity << std::endl;
+ 
 
     /********** ENVIRONMENT **********/
     createEnv( odeHandle, osgHandle, global, env );
+    //auto* obst = new Plane();
+    auto* obst = new Box(30,30,1);
+    obst->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+    obst->setSubstance(Substance::getPlastic(0.8));
+    obst->setPosition(Pos(0,0,1));
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -113,8 +121,8 @@ public:
        robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, 
 				"Sphere", global.odeConfig, 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
-       //robot->place(osg::Matrix::translate(0,0,0.3));
-       robot->place(RobInitPos);
+       robot->place(osg::Matrix::translate(0,0,4));
+       //robot->place(RobInitPos);
        controller = new STSPController( global.odeConfig );
        One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1));
        agent = new OdeAgent( globalData );
@@ -124,7 +132,7 @@ public:
        global.configs.push_back( robot );
     }
     // tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval )
-    // if 1 of the first 3 arguments  == ture:  log file with values is created 
+    // if 1 of the first 3 arguments  == true:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
     TrackOpt->conf.displayTraceDur = 10000; //length of track line
     if(track == true)  agent->setTrackOptions( *TrackOpt );
@@ -154,12 +162,38 @@ public:
 	RobInitPos = Pos(0,0,0);
 	} break;
     case PG: {  //Pos( radius, width of wall, hight of wall), bool: has its own ground or not
+	// creates two playgrounds next to each other, one using the standard ground (same as 
+	// for env = NO), the other uses its own ground which is a box-primitive
 	Playground* world = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, true);
-	world->setPosition( osg::Vec3(0,0,2) );
+	//Substance ground = Substance::getPlastic(0.8);
+	////Substance ground = odeHandle.substance;
+        //std::cout << "Substance of Playground:	roughness:  " << ground.roughness << std::endl;
+	//std::cout<< "				slip:		"<< ground.slip << std::endl;
+	//std::cout<< "				hardness:	"<< ground.hardness << std::endl;
+	//std::cout<< "				elasticity:	"<< ground.elasticity << std::endl;
+	//world->setGroundSubstance( ground );
+	//world->setGroundTexture("Images/whiteground.jpg");
+	//world->setPose( osg::Matrix::translate(0,0,0)* osg::Matrix::rotate(M_PI/2.,1,0,0) );
+	world->setPosition( osg::Vec3(0,0,0) );
 	global.obstacles.push_back( world );
+
+    	Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, false);
+	//Substance groundSubst = Substance::getSnow(0.1);
+	//setGroundSubstance( groundSubst );
+	//setGroundSubstance( ground );
+	//Substance GroundSub = getGroundSubstance(); 
+	//std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
+	//std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
+	//std::cout << "			 hardness:   " << GroundSub.hardness << std::endl;
+	//std::cout << "			 elasticity: " << GroundSub.elasticity << std::endl;
+	world1->setPosition( osg::Vec3(20,0,0) );
+	global.obstacles.push_back( world1 );
+
+
 	setCameraMode( Static );       
 	setCameraHomePos(Pos(3.77046, 29.2309, 36.8821),  Pos(173.891, -53.7632, 0));
-	RobInitPos = Pos(0,0,2);
+	setCameraHomePos(Pos(-34.1465, 17.9342, 21.7339),  Pos(-115.13, -28.0916, 0));
+	RobInitPos = Pos(20,0,10);
 	} break;
     case OP: { 
 	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(15,0.2,0.5), 15, false);
@@ -167,7 +201,7 @@ public:
 	global.obstacles.push_back( world );
 	setCameraMode( Static );
 	setCameraHomePos(Pos(-37.9599, -9.93542, 23.9097),  Pos(-74.8937, -34.2922, 0));
-	RobInitPos = Pos(0,0,2);
+	RobInitPos = Pos(0,0,7);
 	} break;  
      case TI: {
 	TerrainGround* world = new TerrainGround( odeHandle, osgHandle, 
@@ -270,14 +304,36 @@ public:
         				//---"terrains/macrospheresLMH_256.ppm", 128, 128, 3,
         				//"terrains/rauschen32.ppm",  // not tough
         				//"terrains/rauschen32.ppm", 128, 128, 3,
-        				"terrains/whirl32.ppm", 
-        				"terrains/whirl32.ppm", 128, 128, 3,
+        				//"terrains/whirl32.ppm", 
+        				//"terrains/whirl32.ppm", 128, 128, 3,
+        				"./environments/white.ppm",
+        				"Images/whiteground.jpg", 5, 5, 0.,
         				//"terrains/zoo_landscape2.ppm", 
         				//"terrains/zoo_landscape2.ppm", 128, 128, 3,
-					OSGHeightField::Sum);
+					OSGHeightField::Red);
 	world->setPose( osg::Matrix::translate(0,0,0.1) ); 
 	global.obstacles.push_back( world );
-	setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	TerrainGround* world2 = new TerrainGround( odeHandle, osgHandle, 
+        				"./environments/white.ppm",
+        				"Images/whiteground.jpg", 5, 5, 0.,
+					OSGHeightField::Red);
+	world2->setPose( osg::Matrix::translate(5,0,0.1) ); 
+	global.obstacles.push_back( world2 );
+	TerrainGround* world1 = new TerrainGround( odeHandle, osgHandle, 
+        				"./environments/white.ppm",
+        				"Images/whiteground.jpg", 5, 5, 0.,
+					OSGHeightField::Red);
+	world1->setPose( osg::Matrix::translate(5,5,0.1) ); 
+	global.obstacles.push_back( world1 );
+	TerrainGround* world3 = new TerrainGround( odeHandle, osgHandle, 
+        				"./environments/white.ppm",
+        				"Images/whiteground.jpg", 5, 5, 0.,
+					OSGHeightField::Red);
+	world3->setPose( osg::Matrix::translate(0,5,0.1) ); 
+	global.obstacles.push_back( world3 );
+
+	//setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
+	setCameraHomePos(Pos(0.958547, 39.3372, 41.4114),  Pos(-179.292, -45.7944, 0));
 	setCameraMode( Static );
 	} break;
     }
@@ -327,7 +383,8 @@ public:
 	//case 'n' : controller->setRandomU(); break;
 	//case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
-	case 'm' : robot->moveToPosition(Pos(0,0,10.25)); break;
+	case 'm' : robot->moveToPosition(Pos(0,0,0.25)); break;
+	case 'M' : robot->moveToPosition(Pos(20,0,0.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
                    std::cout<< "track file: open or close " << std::endl; break;
         default:
