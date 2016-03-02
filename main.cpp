@@ -67,8 +67,7 @@ public:
     //			 slip:	     0.01
     //			 hardness:   40
     //			 elasticity: 0.5
-    //Substance groundSubst = Substance::getMetal(0.01);
-    //setGroundSubstance( groundSubst );
+    //setGroundSubstance( Substance::getPlastic(1) );
     Substance GroundSub = getGroundSubstance(); 
     std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
     std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
@@ -78,11 +77,16 @@ public:
 
     /********** ENVIRONMENT **********/
     createEnv( odeHandle, osgHandle, global, env );
-    //auto* obst = new Plane();
+    //auto* obst = new Plane(); // the plane is visualized in a certain region, however the properties 
+        		      // are also outside. The plane is spatially extended over all. 
     auto* obst = new Box(30,30,1);
-    obst->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+    obst->init( odeHandle, 10, osgHandle, Primitive::Body | Primitive::Geom | Primitive::Draw );
     obst->setSubstance(Substance::getPlastic(0.8));
     obst->setPosition(Pos(0,0,1));
+
+    //auto* obst2 = new Plane(); // the plane is visualized in a certain region, however the properties 
+    //obst2->init( odeHandle, 100, osgHandle, Primitive::Body | Primitive::Geom | Primitive::Draw );
+    //obst2->setSubstance(Substance::getPlastic(0.8));
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -383,7 +387,7 @@ public:
 	//case 'n' : controller->setRandomU(); break;
 	//case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
-	case 'm' : robot->moveToPosition(Pos(0,0,0.25)); break;
+	case 'm' : robot->moveToPosition(Pos(0,0,3.25)); break;
 	case 'M' : robot->moveToPosition(Pos(20,0,0.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
                    std::cout<< "track file: open or close " << std::endl; break;
