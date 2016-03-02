@@ -34,18 +34,20 @@ public:
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
   
-  //Environments: NO: flat ground
-  //		  PG: playground fenced by a wall
-  //		  HG: 
-  //		  OP: polygonal playground fenced by a wall
-  //		  TB: three basins 
-  //		  PT: three potentials different depth
-  //		  EL: round or elliptical potential
-  //		  ELF: same but different shape
-  //		  PLA: plateau
-  //		  TI: trench
-  //		  RU: 3 little trenchs
-  enum Env { NO, PG, HG, OP, TB, PT, EL, ELF, PLA, TI, RU};
+  /** Environments: NO: flat ground
+  //	if the last argument in the constructor is false, no additional ground is added
+  //		    PG: playground fenced by a wall
+  //		    OP: polygonal playground fenced by a wall
+  //  	TerrainGround objects, their ground is created by using a .ppm file
+  //		    HG: 
+  //		    TB: three basins 
+  //		    PT: three potentials different depth
+  //		    EL: round or elliptical potential
+  //		    ELF: same but different shape
+  //		    PLA: plateau
+  //		    TI: trench
+  //		    RU: 3 little trenchs  */
+  enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU};
   Env env = NO;
 
   ThisSim(){ //for definitions see osg/base.h
@@ -64,10 +66,10 @@ public:
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
     //The default values of substance is defined in odeHandle.substance
     //odeHandle Substance: roughness:  0.8
-    //			 slip:	     0.01
-    //			 hardness:   40
-    //			 elasticity: 0.5
-    //setGroundSubstance( Substance::getPlastic(1) );
+    //			   slip        0.01
+    //			   hardness:   40
+    //			   elasticity: 0.5
+    setGroundSubstance( Substance::getPlastic(0.8) );
     Substance GroundSub = getGroundSubstance(); 
     std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
     std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
@@ -77,16 +79,28 @@ public:
 
     /********** ENVIRONMENT **********/
     createEnv( odeHandle, osgHandle, global, env );
-    //auto* obst = new Plane(); // the plane is visualized in a certain region, however the properties 
-        		      // are also outside. The plane is spatially extended over all. 
-    auto* obst = new Box(30,30,1);
-    obst->init( odeHandle, 10, osgHandle, Primitive::Body | Primitive::Geom | Primitive::Draw );
-    obst->setSubstance(Substance::getPlastic(0.8));
-    obst->setPosition(Pos(0,0,1));
 
-    //auto* obst2 = new Plane(); // the plane is visualized in a certain region, however the properties 
-    //obst2->init( odeHandle, 100, osgHandle, Primitive::Body | Primitive::Geom | Primitive::Draw );
-    //obst2->setSubstance(Substance::getPlastic(0.8));
+    // create a plane for testing purposes
+    auto* plane = new Plane();
+    plane->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+    plane->setSubstance(Substance::getPlastic(0.8));
+    Substance planeSub = plane->substance; 
+    std::cout << "Plane Substance:       roughness:  " << planeSub.roughness << std::endl;
+    std::cout << "			 slip:	     " << planeSub.slip << std::endl;
+    std::cout << "			 hardness:   " << planeSub.hardness << std::endl;
+    std::cout << "			 elasticity: " << planeSub.elasticity << std::endl;
+
+    // create a box for testing purposes
+    auto* box = new Box(30,30,1);
+    box->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+    box->setSubstance(Substance::getPlastic(0.8));
+    box->setPosition(Pos(0,0,1)); //member function of Box class
+    Substance boxSub = plane->substance; 
+    std::cout << "Box Substance:         roughness:  " << boxSub.roughness << std::endl;
+    std::cout << "			 slip:	     " << boxSub.slip << std::endl;
+    std::cout << "			 hardness:   " << boxSub.hardness << std::endl;
+    std::cout << "			 elasticity: " << boxSub.elasticity << std::endl;
+   
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -121,7 +135,7 @@ public:
        // to change the substance/material of the robot. be careful: material influences the behaviour
        OdeHandle myHandle = odeHandle;    // default: plastic with roughness= 0.8
        //myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
-       //myHandle.substance.toRubber(50); // hardness [5,50], high roughness, no slip, very elastic
+       //myHandle.substance.toRubber(50);   // hardness [5,50], high roughness, no slip, very elastic
        robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, 
 				"Sphere", global.odeConfig, 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
@@ -387,8 +401,8 @@ public:
 	//case 'n' : controller->setRandomU(); break;
 	//case 'm' : controller->setRandomX(10.); break;
 	case 'r' : controller->setRandomAll(10.); break;
-	case 'm' : robot->moveToPosition(Pos(0,0,3.25)); break;
-	case 'M' : robot->moveToPosition(Pos(20,0,0.25)); break;
+	case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
+	case 'M' : robot->moveToPosition(Pos(40,0,2.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
                    std::cout<< "track file: open or close " << std::endl; break;
         default:
