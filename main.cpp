@@ -83,13 +83,18 @@ public:
     /** create a plane for testing purposes */
     //auto* plane = new Plane();
     //plane->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
-    //plane->setSubstance(Substance::getFoam(1));
+    //plane->setSubstance(Substance::getPlastic(0.8));
     //Substance planeSub = plane->substance; 
     //std::cout << "Plane Substance:       roughness:  " << planeSub.roughness << std::endl;
     //std::cout << "			 slip:	     " << planeSub.slip << std::endl;
     //std::cout << "			 hardness:   " << planeSub.hardness << std::endl;
     //std::cout << "			 elasticity: " << planeSub.elasticity << std::endl;
 
+    //auto* plane1 = new Plane();
+    //plane1->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+    //plane1->setSubstance(Substance::getPlastic(0.8));
+    //plane1->setSubstance(Substance::getMetal(0.8));
+ 
     /** create a box for testing purposes */
     //auto* box = new Box(30,30,5);
     //box->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
@@ -152,7 +157,7 @@ public:
     /** tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval ) */
     // if 1 of the first 3 arguments  == true:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    TrackOpt->conf.displayTraceDur = 10000; //length of track line
+    TrackOpt->conf.displayTraceDur = 1000; //length of track line
     if(track == true)  agent->setTrackOptions( *TrackOpt );
   };
 
@@ -188,7 +193,7 @@ public:
 	
 
 	/** Playground using the normal ground which is of type Plane */
-    	Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, false);
+    	//Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, false);
 	//setGroundSubstance( groundSubst );
 	//setGroundSubstance( ground );
 	//Substance GroundSub = getGroundSubstance(); 
@@ -196,8 +201,8 @@ public:
 	//std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
 	//std::cout << "			 hardness:   " << GroundSub.hardness << std::endl;
 	//std::cout << "			 elasticity: " << GroundSub.elasticity << std::endl;
-	world1->setPosition( osg::Vec3(0,0,0) );
-	global.obstacles.push_back( world1 );
+	//world1->setPosition( osg::Vec3(0,0,0) );
+	//global.obstacles.push_back( world1 );
 
 	/** Playground using a Box as ground  */
 	//Playground* world = new Playground( odeHandle, osgHandle, osg::Vec3(20, 0.2, 0.2), 1, true);
@@ -228,9 +233,9 @@ public:
 
 
 	/** additional wall -> corridor */
-    	//Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(7, 0.2, 0.2), 1, false);
-	//world1->setPosition( osg::Vec3(4,0,0) );
-	//global.obstacles.push_back( world1 );
+    	Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(7, 0.2, 0.2), 1, false);
+	world1->setPosition( osg::Vec3(4,0,0) );
+	global.obstacles.push_back( world1 );
 	
 
 	} break;  
@@ -342,7 +347,7 @@ public:
         				//"terrains/zoo_landscape2.ppm", 
         				//"terrains/zoo_landscape2.ppm", 128, 128, 3,
 					OSGHeightField::Red);
-	world->setPose( osg::Matrix::translate(0,0,0.1) ); 
+	world->setPose( osg::Matrix::translate(0,0,2) ); 
 	global.obstacles.push_back( world );
 	//TerrainGround* world2 = new TerrainGround( odeHandle, osgHandle, 
         //				"./environments/white.ppm",
@@ -366,6 +371,7 @@ public:
 	//setCameraHomePos( Pos(-0.153522, 31.808, 35.3312), Pos(-179.292, -45.7944, 0) );
 	setCameraHomePos(Pos(0.958547, 39.3372, 41.4114),  Pos(-179.292, -45.7944, 0));
 	setCameraMode( Static );
+	RobInitPos = Pos(0,0,3); 
 	} break;
     }
 
