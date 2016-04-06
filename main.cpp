@@ -48,7 +48,7 @@ public:
   //		    TI: trench
   //		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = OP;
+  Env env = NO;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -62,14 +62,14 @@ public:
     global.odeConfig.setParam("noise",0);
     global.odeConfig.setParam("controlinterval",1);
     global.odeConfig.setParam("realtimefactor",1);
-    global.odeConfig.setParam("simstepsize", 0.01);
+    global.odeConfig.setParam("simstepsize", 0.001);
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
     //The default values of substance is defined in odeHandle.substance
     //odeHandle Substance: roughness:  0.8
     //			   slip        0.01
     //			   hardness:   40
     //			   elasticity: 0.5
-    setGroundSubstance( Substance::getPlastic(0.8) );
+    //setGroundSubstance( Substance::getPlastic(0.8) );
     Substance GroundSub = getGroundSubstance(); 
     std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
     std::cout << "			 slip:	     " << GroundSub.slip << std::endl;
@@ -157,7 +157,7 @@ public:
     /** tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval ) */
     // if 1 of the first 3 arguments  == true:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    TrackOpt->conf.displayTraceDur = 1000; //length of track line
+    TrackOpt->conf.displayTraceDur = 800; //length of track line
     if(track == true)  agent->setTrackOptions( *TrackOpt );
   };
 

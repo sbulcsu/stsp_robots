@@ -34,7 +34,7 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
      addParameterDef("T_u", &T_u, 0.3, "");
      addParameterDef("T_phi", &T_phi, 0.6, "");
      addParameterDef("U_max", &U_max, 1., "");
-     addParameterDef("gamma", &gamma, 10, "");
+     addParameterDef("gamma", &gamma, 20, "");
 
      neuron.resize(number_motors);
      for(int i = 0; i<number_motors; i++){
