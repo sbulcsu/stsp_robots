@@ -224,7 +224,7 @@ public:
 	RobInitPos = Pos(0,0,0);
 	} break;
     case OP: { 
-	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(15,0.2,0.5), 15, false);
+	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(10,0.2,0.5), 15, false);
 	world->setPose( osg::Matrix::translate(0,0,0) );
 	global.obstacles.push_back( world );
 	setCameraMode( Static );
@@ -233,10 +233,17 @@ public:
 
 
 	/** additional wall -> corridor */
-    	Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(7, 0.2, 0.2), 1, false);
-	world1->setPosition( osg::Vec3(4,0,0) );
-	global.obstacles.push_back( world1 );
-	
+    	//Playground* world1 = new Playground( odeHandle, osgHandle, osg::Vec3(7, 0.2, 0.2), 1, false);
+	//world1->setPosition( osg::Vec3(4,0,0) );
+	//global.obstacles.push_back( world1 );
+
+	/** create a box for testing purposes */
+	//auto* box = new Box(1,1,0.5);
+	//box->init( odeHandle, 2, osgHandle,  Primitive::Geom | Primitive::Draw | Primitive::Body );
+	//box->setSubstance(Substance::getPlastic(0.8));
+	//box->setPosition(Pos(0,0,0.2)); //member function of Box class
+	//global.obstacles.push_back( box );
+ 
 
 	} break;  
      case TI: {
