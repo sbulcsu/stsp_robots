@@ -430,7 +430,11 @@ public:
 	case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
 	case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
-                   std::cout<< "track file: open or close " << std::endl; break;
+                   std::cout<< "Track file: open " << std::endl; break;
+        case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
+                   std::cout<< "Track file: close " << std::endl; break;
+        case 's' : agent->stopTracking();
+                   std::cout<< "Stop tracking" << std::endl; break;
         default:
                 return false;
                 break;

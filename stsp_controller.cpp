@@ -29,8 +29,8 @@ void STSPController::init(int sensornumber, int motornumber, RandGen* randGen){
      addParameterDef("a", &a, 0.4);
      addParameterDef("b", &b, 0);   
      addParameterDef("r", &r, 1., "scaling factor of the sigmoidal function (<=1)");
-     addParameterDef("w_0", &w_0, 168., "");
-     addParameterDef("z_0", &z_0, -290., "");
+     addParameterDef("w_0", &w_0, 220., "");
+     addParameterDef("z_0", &z_0, -450., "");
      addParameterDef("T_u", &T_u, 0.3, "");
      addParameterDef("T_phi", &T_phi, 0.6, "");
      addParameterDef("U_max", &U_max, 1., "");
