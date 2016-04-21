@@ -4,6 +4,7 @@
 #include <ode_robots/octaplayground.h>
 #include <ode_robots/terrainground.h>
 #include <ode_robots/meshground.h>
+#include <ode_robots/randomobstacles.h>
 //#include <ode_robots/passivesphere.h>
 //#include <ode_robots/passivebox.h>
 #include <selforg/noisegenerator.h>
@@ -30,12 +31,13 @@ public:
   double friction;
   bool track = true; 
   Pos RobInitPos;
+  RandomObstacles* RandObstacle; 
 
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
   
   /** Environments: NO: flat ground
-  //	if the last argument in the constructor is false, no additional ground is added
+  /	if the last argument in the constructor is false, no additional ground is added
   //		    PG: playground fenced by a wall
   //		    OP: polygonal playground fenced by a wall
   //  	TerrainGround objects, their ground is created by using a .ppm file
@@ -78,8 +80,10 @@ public:
  
 
     /********** ENVIRONMENT **********/
+    /** to create different environments as walls */
+    /** be carefull when using different grounds, this can modify the locomotions */
+    /** different calculation of contact points is the most likely reason */
     createEnv( odeHandle, osgHandle, global, env );
-
     /** create a plane for testing purposes */
     //auto* plane = new Plane();
     //plane->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
@@ -105,7 +109,17 @@ public:
     //std::cout << "			 slip:	     " << boxSub.slip << std::endl;
     //std::cout << "			 hardness:   " << boxSub.hardness << std::endl;
     //std::cout << "			 elasticity: " << boxSub.elasticity << std::endl;
-   
+
+
+    /****** RANDOM OBSTACLES ********/
+    /** to enable online generation of random obstacles with certain characteristics */
+    RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
+    randConf.minSize = Pos(.4,.4,.4);
+    randConf.maxSize = Pos(.8,.8,.8);
+    randConf.maxDensity = 5;
+    RandObstacle = new  RandomObstacles(odeHandle, osgHandle, randConf);
+
+  
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -384,7 +398,10 @@ public:
 
   }
 
-  
+ 
+
+
+
   virtual bool command(const OdeHandle&, const OsgHandle&, GlobalData& globalData, int key, bool down){
     if (down) { // only when key is pressed, not when released
       switch ( (char) key )
@@ -399,12 +416,12 @@ public:
         case 'U' : dBodyAddForce( robot->getMainPrimitive()->getBody() , -100, 0, 0 ); break;
         case 'i' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 0, 100, 0 ); break;
         case 'I' : dBodyAddForce( robot->getMainPrimitive()->getBody() , 0, -100, 0 ); break;
-        case 'a' : controller->increaseA(-0.02);
-                   std::cout << "new a:  "<<controller->getParam("a") << std::endl;
-                   break;
-        case 'A' : controller->increaseA(0.02);
-                   std::cout << "new a:  "<<controller->getParam("a") << std::endl;
-                   break;
+        //case 'a' : controller->increaseA(-0.02);
+        //           std::cout << "new a:  "<<controller->getParam("a") << std::endl;
+        //           break;
+        //case 'A' : controller->increaseA(0.02);
+        //           std::cout << "new a:  "<<controller->getParam("a") << std::endl;
+        //           break;
         case 'w' : controller->increaseW(-1);
                    std::cout << "new w_0:  "<<controller->getParam("w_0") << std::endl;
                    break;
@@ -417,16 +434,16 @@ public:
         case 'Z' : controller->increaseZ(-1.);
                    std::cout<< "new z_0:  "<<controller->getParam("z_0")<< std::endl;
                    break;
-        case 'g' : controller->increaseGamma(-0.1);
-                   std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
-                   break;
-        case 'G' : controller->increaseGamma(0.1);
-                   std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
-                   break;
+        //case 'g' : controller->increaseGamma(-0.1);
+        //           std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
+        //           break;
+        //case 'G' : controller->increaseGamma(0.1);
+        //           std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
+        //           break;
+	case 'r' : controller->setRandomAll(10.); break;
 	//case 'b' : controller->setRandomPhi(); break;
 	//case 'n' : controller->setRandomU(); break;
 	//case 'm' : controller->setRandomX(10.); break;
-	case 'r' : controller->setRandomAll(10.); break;
 	case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
 	case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
@@ -435,6 +452,9 @@ public:
                    std::cout<< "Track file: close " << std::endl; break;
         case 's' : agent->stopTracking();
                    std::cout<< "Stop tracking" << std::endl; break;
+	case 'q' : RandObstacle->spawn(); 
+		   globalData.obstacles.push_back( RandObstacle );
+		   break;
         default:
                 return false;
                 break;
@@ -446,7 +466,7 @@ public:
 
 int main (int argc, char **argv){
   ThisSim sim;
-  sim.setCaption("Robot with STSP controller (lpzrobots Simulator)   Martin 2016");
+  sim.setCaption("Robot with STSP controlling (lpzrobots Simulator)   Martin 2016");
   return sim.run(argc, argv) ? 0 : 1;
 }
 
