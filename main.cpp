@@ -50,7 +50,7 @@ public:
   //		    TI: trench
   //		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = NO;
+  Env env = OP;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -114,12 +114,18 @@ public:
     /****** RANDOM OBSTACLES ********/
     /** to enable online generation of random obstacles with certain characteristics */
     RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
+    randConf.pose = osg::Matrix::translate(0,0,0);
+    randConf.area = Pos(4,4,2);
     randConf.minSize = Pos(.4,.4,.4);
-    randConf.maxSize = Pos(.8,.8,.8);
-    randConf.maxDensity = 5;
+    randConf.maxSize = Pos(1.5,1.5,.8);
+    randConf.maxDensity = 2;
     RandObstacle = new  RandomObstacles(odeHandle, osgHandle, randConf);
-
-  
+    /** Generation an placing Objects */
+    int num_randObs = 5; 
+    for (int i=0; i< num_randObs; i++){
+    	RandObstacle->spawn();
+    	global.obstacles.push_back( RandObstacle );
+    }
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -171,7 +177,7 @@ public:
     /** tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval ) */
     // if 1 of the first 3 arguments  == true:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    TrackOpt->conf.displayTraceDur = 800; //length of track line
+    TrackOpt->conf.displayTraceDur = 200; //length of track line
     if(track == true)  agent->setTrackOptions( *TrackOpt );
   };
 
@@ -238,7 +244,7 @@ public:
 	RobInitPos = Pos(0,0,0);
 	} break;
     case OP: { 
-	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(10,0.2,0.5), 15, false);
+	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(5,0.2,0.5), 15, false);
 	world->setPose( osg::Matrix::translate(0,0,0) );
 	global.obstacles.push_back( world );
 	setCameraMode( Static );
@@ -454,6 +460,9 @@ public:
                    std::cout<< "Stop tracking" << std::endl; break;
 	case 'q' : RandObstacle->spawn(); 
 		   globalData.obstacles.push_back( RandObstacle );
+		   break;
+	case 'Q' : RandObstacle->remove(); 
+		   globalData.obstacles.pop_back(); 
 		   break;
         default:
                 return false;
