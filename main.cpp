@@ -176,6 +176,7 @@ public:
        global.configs.push_back( robot );
     }
     /** tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval ) */
+    /** more options in selforg/utils/trackrobot.h */
     // if 1 of the first 3 arguments  == true:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
     TrackOpt->conf.displayTraceDur = 200; //length of track line
