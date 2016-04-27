@@ -118,12 +118,13 @@ public:
     randConf.area = Pos(4,4,2);
     randConf.minSize = Pos(.4,.4,.4);
     randConf.maxSize = Pos(1.5,1.5,.8);
-    randConf.maxDensity = 2;
-    RandObstacle = new  RandomObstacles(odeHandle, osgHandle, randConf);
+    randConf.minDensity = 1;
+    randConf.maxDensity = 10;
+    RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
     /** Generation an placing Objects */
-    int num_randObs = 5; 
+    int num_randObs = 7; 
     for (int i=0; i< num_randObs; i++){
-    	RandObstacle->spawn();
+    	RandObstacle->spawn(RandomObstacles::Box, RandomObstacles::Foam);
     	global.obstacles.push_back( RandObstacle );
     }
 
@@ -178,6 +179,7 @@ public:
     // if 1 of the first 3 arguments  == true:  log file with values is created 
     TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
     TrackOpt->conf.displayTraceDur = 200; //length of track line
+    TrackOpt->conf.displayTraceThickness = 0.01; //thickness of track line, if 0 then it is a line
     if(track == true)  agent->setTrackOptions( *TrackOpt );
   };
 
@@ -248,7 +250,8 @@ public:
 	world->setPose( osg::Matrix::translate(0,0,0) );
 	global.obstacles.push_back( world );
 	setCameraMode( Static );
-	setCameraHomePos(Pos(-37.9599, -9.93542, 23.9097),  Pos(-74.8937, -34.2922, 0));
+	setCameraHomePos(Pos(-7.60245, -1.26259, 16.1609),  Pos(-75.9145, -65.364, 0));
+	//setCameraHomePos(Pos(-37.9599, -9.93542, 23.9097),  Pos(-74.8937, -34.2922, 0));
 	RobInitPos = Pos(0,0,0);
 
 
@@ -454,9 +457,11 @@ public:
 	case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
         case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
                    std::cout<< "Track file: open " << std::endl; break;
-        case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
+	case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
                    std::cout<< "Track file: close " << std::endl; break;
-        case 's' : agent->stopTracking();
+        case 's' : agent->setTrackOptions(TrackRobot(false, false, false, true)); 
+                   std::cout<< "drawing track line " << std::endl; break;
+        case 'S' : agent->stopTracking();
                    std::cout<< "Stop tracking" << std::endl; break;
 	case 'q' : RandObstacle->spawn(); 
 		   globalData.obstacles.push_back( RandObstacle );
