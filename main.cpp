@@ -50,7 +50,7 @@ public:
   //		    TI: trench
   //		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = OP;
+  Env env = NO;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -113,20 +113,20 @@ public:
 
     /****** RANDOM OBSTACLES ********/
     /** to enable online generation of random obstacles with certain characteristics */
-    RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
-    randConf.pose = osg::Matrix::translate(0,0,0);
-    randConf.area = Pos(4,4,2);
-    randConf.minSize = Pos(.4,.4,.4);
-    randConf.maxSize = Pos(1.5,1.5,.8);
-    randConf.minDensity = 1;
-    randConf.maxDensity = 10;
-    RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
-    /** Generation an placing Objects */
-    int num_randObs = 7; 
-    for (int i=0; i< num_randObs; i++){
-    	RandObstacle->spawn(RandomObstacles::Box, RandomObstacles::Foam);
-    	global.obstacles.push_back( RandObstacle );
-    }
+	// RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
+    // randConf.pose = osg::Matrix::translate(0,0,0);
+    // randConf.area = Pos(4,4,2);
+    // randConf.minSize = Pos(.4,.4,.4);
+    // randConf.maxSize = Pos(1.5,1.5,.8);
+    // randConf.minDensity = 1;
+    // randConf.maxDensity = 10;
+    // RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
+    // /** Generation an placing Objects */
+    // int num_randObs = 7; 
+    // for (int i=0; i< num_randObs; i++){
+    // 	RandObstacle->spawn(RandomObstacles::Box, RandomObstacles::Foam);
+    // 	global.obstacles.push_back( RandObstacle );
+    // }
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
