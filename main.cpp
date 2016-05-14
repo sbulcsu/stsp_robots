@@ -18,6 +18,7 @@
 #include "sphere_robot.h"
 #include "barrel_robot.h"
 #include "stsp_controller.h"
+#include "trailingaverage.h"
 
 using namespace lpzrobots;
 using namespace std;
