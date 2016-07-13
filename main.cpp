@@ -29,7 +29,7 @@ public:
   OdeAgent* agent;
   OdeRobot* robot;
   double friction;
-  bool track = true; 
+  bool track = false; 
   Pos RobInitPos;
   RandomObstacles* RandObstacle; 
 
@@ -113,20 +113,20 @@ public:
 
     /****** RANDOM OBSTACLES ********/
     /** to enable online generation of random obstacles with certain characteristics */
-	// RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
-    // randConf.pose = osg::Matrix::translate(0,0,0);
-    // randConf.area = Pos(4,4,2);
-    // randConf.minSize = Pos(.4,.4,.4);
-    // randConf.maxSize = Pos(1.5,1.5,.8);
-    // randConf.minDensity = 1;
-    // randConf.maxDensity = 10;
-    // RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
-    // /** Generation an placing Objects */
-    // int num_randObs = 7; 
-    // for (int i=0; i< num_randObs; i++){
-    // 	RandObstacle->spawn(RandomObstacles::Box, RandomObstacles::Foam);
-    // 	global.obstacles.push_back( RandObstacle );
-    // }
+	//RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
+    //randConf.pose = osg::Matrix::translate(0,0,0);
+    //randConf.area = Pos(4,4,2);
+    //randConf.minSize = Pos(.4,.4,.4);
+    //randConf.maxSize = Pos(1.5,1.5,.8);
+    //randConf.minDensity = 1;
+    //randConf.maxDensity = 10;
+    //RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
+    ///** Generation an placing Objects */
+    //int num_randObs = 7; 
+    //for (int i=0; i< num_randObs; i++){
+    //	RandObstacle->spawn(RandomObstacles::Box, RandomObstacles::Foam);
+    //	global.obstacles.push_back( RandObstacle );
+    //}
 
     /*********** ROBOTS  **********/
     if(type == TypeBarrel){
@@ -140,7 +140,7 @@ public:
        conf.motorsensor=true;           
        robot = new BarrelRobot(odeHandle, osgHandle.changeColor(Color(0.0,0.0,1.0)),
                                conf, "Barrel", 0.4, 2); 
-       robot->place (osg::Matrix::rotate(M_PI/2, 1,0,0)*osg::Matrix::translate(0,0,10)); 
+       robot->place (osg::Matrix::rotate(M_PI/4, 1,1,0)*osg::Matrix::translate(0,0,1)); 
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Translational ),Attachment(-1));
        robot->addSensor(std::make_shared<SpeedSensor>( 1,SpeedSensor::Rotational ),Attachment(-1));
        controller = new STSPController( global.odeConfig );
@@ -250,8 +250,10 @@ public:
 	OctaPlayground* world = new OctaPlayground( odeHandle, osgHandle, Pos(5,0.2,0.5), 15, false);
 	world->setPose( osg::Matrix::translate(0,0,0) );
 	global.obstacles.push_back( world );
-	setCameraMode( Static );
-	setCameraHomePos(Pos(-7.60245, -1.26259, 16.1609),  Pos(-75.9145, -65.364, 0));
+	//setCameraMode( Static );
+	//setCameraHomePos(Pos(-7.60245, -1.26259, 16.1609),  Pos(-75.9145, -65.364, 0));
+	setCameraHomePos(Pos(-0.0172261, 1.94153, 0.446375),  Pos(-174.344, -9.53503, 0));
+	setCameraMode( Follow );
 	//setCameraHomePos(Pos(-37.9599, -9.93542, 23.9097),  Pos(-74.8937, -34.2922, 0));
 	RobInitPos = Pos(0,0,0);
 
@@ -450,29 +452,29 @@ public:
         //case 'G' : controller->increaseGamma(0.1);
         //           std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
         //           break;
-	case 'r' : controller->setRandomAll(10.); break;
-	//case 'b' : controller->setRandomPhi(); break;
-	//case 'n' : controller->setRandomU(); break;
-	//case 'm' : controller->setRandomX(10.); break;
-	case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
-	case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
-        case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false)); 
-                   std::cout<< "Track file: open " << std::endl; break;
-	case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
-                   std::cout<< "Track file: close " << std::endl; break;
-        case 's' : agent->setTrackOptions(TrackRobot(false, false, false, true)); 
-                   std::cout<< "drawing track line " << std::endl; break;
-        case 'S' : agent->stopTracking();
-                   std::cout<< "Stop tracking" << std::endl; break;
-	case 'q' : RandObstacle->spawn(); 
-		   globalData.obstacles.push_back( RandObstacle );
-		   break;
-	case 'Q' : RandObstacle->remove(); 
-		   globalData.obstacles.pop_back(); 
-		   break;
-        default:
-                return false;
-                break;
+		case 'r' : controller->setRandomAll(10.); break;
+		//case 'b' : controller->setRandomPhi(); break;
+		//case 'n' : controller->setRandomU(); break;
+		//case 'm' : controller->setRandomX(10.); break;
+		case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
+		case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
+	    case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false,"",500)); 
+	               std::cout<< "Track file: open " << std::endl; break;
+		case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
+	               std::cout<< "Track file: close " << std::endl; break;
+	    case 's' : agent->setTrackOptions(TrackRobot(false, false, false, true)); 
+	               std::cout<< "drawing track line " << std::endl; break;
+	    case 'S' : agent->stopTracking();
+	               std::cout<< "Stop tracking" << std::endl; break;
+		case 'q' : RandObstacle->spawn(); 
+				   globalData.obstacles.push_back( RandObstacle );
+				   break;
+		case 'Q' : RandObstacle->remove(); 
+				   globalData.obstacles.pop_back(); 
+			  	   break;
+	    default:
+	           return false;
+	           break;
         }
     }
     return false;
