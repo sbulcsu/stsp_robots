@@ -37,18 +37,18 @@ public:
   robotType type= TypeSphere;
   
   /** Environments: NO: flat ground
-  /	if the last argument in the constructor is false, no additional ground is added
-  //		    PG: playground fenced by a wall
-  //		    OP: polygonal playground fenced by a wall
-  //  	TerrainGround objects, their ground is created by using a .ppm file
-  //		    HG: flat ground created by white .ppm file
-  //		    TB: three basins 
-  //		    PT: three potentials different depth
-  //		    EL: round or elliptical potential
-  //		    ELF: same but different shape
-  //		    PLA: plateau
-  //		    TI: trench
-  //		    RU: 3 little trenchs  */
+  **	if the last argument in the constructor is false, no additional ground is added
+  **		    PG: playground fenced by a wall
+  **		    OP: polygonal playground fenced by a wall
+  **  	TerrainGround objects, their ground is created by using a .ppm file
+  **		    HG: flat ground created by white .ppm file
+  **		    TB: three basins 
+  **		    PT: three potentials different depth
+  **		    EL: round or elliptical potential
+  **		    ELF: same but different shape
+  **		    PLA: plateau
+  **		    TI: trench
+  **		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU};
   Env env = NO;
 
@@ -168,7 +168,11 @@ public:
        //robot->place(osg::Matrix::translate(0,0,20));
        robot->place(RobInitPos);
        controller = new STSPController( global.odeConfig );
-       One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(0.1));
+
+       //One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(1.) ); // 1. for white noise
+	   // plotTypes=8 == Noise, Default == Controller
+       One2OneWiring* wiring = new One2OneWiring( new WhiteNormalNoise() ); 
+
        agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
        global.agents.push_back( agent );
