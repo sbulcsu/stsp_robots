@@ -49,8 +49,8 @@ public:
   **		    PLA: plateau
   **		    TI: trench
   **		    RU: 3 little trenchs  */
-  enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU};
-  Env env = NO;
+  enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU, maze};
+  Env env = maze;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -66,11 +66,8 @@ public:
     global.odeConfig.setParam("realtimefactor",1);
     global.odeConfig.setParam("simstepsize", 0.001);
     global.odeConfig.addParameterDef("friction", &friction, 0.3, "rolling friction coefficient");
-    //The default values of substance is defined in odeHandle.substance
-    //odeHandle Substance: roughness:  0.8
-    //			   slip        0.01
-    //			   hardness:   40
-    //			   elasticity: 0.5
+    /** The default values of substance is defined in odeHandle.substance  */
+    /** odeHandle Substance: roughness:  0.8,  slip:  0.01,   hardness:  40,  elasticity:  0.5  */
     //setGroundSubstance( Substance::getPlastic(0.8) );
     Substance GroundSub = getGroundSubstance(); 
     std::cout << "GroundSubstance:	 roughness:  " << GroundSub.roughness << std::endl;
@@ -158,10 +155,10 @@ public:
        SphereRobotConf sconf = SphereRobot::getDefaultConf();
        sconf.diameter = 0.5;
        sconf.motorpowerfactor = 120;
-       // to change the substance/material of the robot. be careful: material influences the behaviour
-       OdeHandle myHandle = odeHandle;    // default: plastic with roughness= 0.8
-       //myHandle.substance.toMetal(0.5);   // roughness [0.1,1], very hard, elastic, slip 
-       //myHandle.substance.toRubber(50);   // hardness [5,50], high roughness, no slip, very elastic
+       /** to change the substance/material of the robot. be careful: material influences the behaviour */
+       OdeHandle myHandle = odeHandle;    /** default: plastic with roughness= 0.8 */
+       //myHandle.substance.toMetal(0.5);   /** roughness [0.1,1], very hard, elastic, slip */
+       //myHandle.substance.toRubber(50);   /** hardness [5,50], high roughness, no slip, very elastic */
        robot = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,0.,1.)), sconf, 
 				"Sphere", global.odeConfig, 0.4);
        robot->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
@@ -169,9 +166,8 @@ public:
        robot->place(RobInitPos);
        controller = new STSPController( global.odeConfig );
 
-       //One2OneWiring* wiring = new One2OneWiring( new ColorUniformNoise(1.) ); // 1. for white noise
-	   // plotTypes=8 == Noise, Default == Controller
-       One2OneWiring* wiring = new One2OneWiring( new WhiteNormalNoise() ); 
+       /** plotTypes=8 == Noise, Default == Controller */
+       One2OneWiring* wiring = new One2OneWiring( new WhiteNormalNoise() );  // new One2OneWiring( new ColorUniformNoise(1.) );
 
        agent = new OdeAgent( globalData );
        agent->init( controller, robot, wiring );
@@ -179,20 +175,23 @@ public:
        global.configs.push_back( controller );
        global.configs.push_back( robot );
     }
+
     /** tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval ) */
     /** more options in selforg/utils/trackrobot.h */
-    // if 1 of the first 3 arguments  == true:  log file with values is created 
-    TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    TrackOpt->conf.displayTraceDur = 200; //length of track line
-    TrackOpt->conf.displayTraceThickness = 0.01; //thickness of track line, if 0 then it is a line
-    if(track == true)  agent->setTrackOptions( *TrackOpt );
+    /** if 1 of the first 3 arguments  == true:  log file with values is created */
+    if(track == true){
+	TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
+    	TrackOpt->conf.displayTraceDur = 200; /** length of track line */
+    	TrackOpt->conf.displayTraceThickness = 0.01; /** thickness of track line, if 0 then it is a line */
+	agent->setTrackOptions( *TrackOpt );
+    }
   };
 
 
 
 
   virtual void addCallback(GlobalData& globalData, bool draw, bool pause, bool control) {
-    if(!pause){    // if not really neccesary here..?
+    if(!pause){
        if(friction>0){
           OdeRobot* robot = globalData.agents[0]->getRobot();
           Pos vel = robot->getMainPrimitive()->getAngularVel();
@@ -209,6 +208,52 @@ public:
     case NO: {
 	setCameraMode( Follow );        
 	setCameraHomePos( Pos(0.0303593, 6.97324, 3.69894),  Pos(-177.76, -24.8858, 0) );
+	RobInitPos = Pos(0,0,0);
+	} break;
+    case maze: {
+	srand(time(NULL));
+
+	double widthX = 20;
+	int num_wall = 5;
+    	Playground* maze = new Playground( odeHandle, osgHandle, osg::Vec3(widthX, 0.2, 0.3), 1, false);
+	maze->setPosition( osg::Vec3(0,0,0) );
+	global.obstacles.push_back( maze );
+
+	Box* wall[num_wall];
+	wall[0] = new Box( 10, 0.2, 0.3 );
+	wall[0]->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+	wall[0]->setPosition( Pos(5,2,0) ); 
+
+	wall[1] = new Box( 0.2, 8, 0.3 );
+	wall[1]->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+	wall[1]->setPosition( Pos(2,2,0) ); 
+	
+	wall[2] = new Box( 15, 0.2, 0.3 );
+	wall[2]->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+	wall[2]->setPosition( Pos(-2.5,-6,0) ); 
+
+	wall[3] = new Box( 0.2, 10, 0.3 );
+	wall[3]->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+	wall[3]->setPosition( Pos(-4,3,0) ); 
+
+	wall[4] = new Box( 6, 0.2, 0.3 );
+	wall[4]->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+	wall[4]->setPosition( Pos(-1,-2,0) ); 
+
+	//for(int i=0; i<num_wall; i++){
+	//    double wwidth = rand()%5 +5 ;
+	//    double wlen = 0.2;
+	//    if( rand()%2 ==1 ) wall[i] = new Box( wwidth, wlen, 0.3 );
+	//    else  wall[i] = new Box( wlen, wwidth, 0.3 );
+	//    double posx = rand()%15*1.5 - widthX/2;
+	//    double posy = rand()%15*2   - widthX/2;
+	//    wall[i]->init( odeHandle, 0, osgHandle, Primitive::Geom | Primitive::Draw );
+	//    wall[i]->setPosition( Pos(posx,posy,0) ); 
+	//}	
+
+	setCameraMode( Static );        
+	//setCameraHomePos(Pos(-0.403611, 41.6779, 46.5942),  Pos(179.949, -51.1891, 0));
+	setCameraHomePos(Pos(0.0919222, 18.978, 33.1766),  Pos(179.697, -62.2167, 0));
 	RobInitPos = Pos(0,0,0);
 	} break;
     case PG: {  //Pos( radius, width of wall, hight of wall), bool: has its own ground or not
@@ -456,29 +501,29 @@ public:
         //case 'G' : controller->increaseGamma(0.1);
         //           std::cout<< "new gamma:  "<<controller->getParam("gamma")<< std::endl;
         //           break;
-		case 'r' : controller->setRandomAll(10.); break;
-		//case 'b' : controller->setRandomPhi(); break;
-		//case 'n' : controller->setRandomU(); break;
-		//case 'm' : controller->setRandomX(10.); break;
-		case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
-		case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
-	    case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false,"",500)); 
-	               std::cout<< "Track file: open " << std::endl; break;
-		case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
-	               std::cout<< "Track file: close " << std::endl; break;
-	    case 's' : agent->setTrackOptions(TrackRobot(false, false, false, true)); 
-	               std::cout<< "drawing track line " << std::endl; break;
-	    case 'S' : agent->stopTracking();
-	               std::cout<< "Stop tracking" << std::endl; break;
-		case 'q' : RandObstacle->spawn(); 
-				   globalData.obstacles.push_back( RandObstacle );
-				   break;
-		case 'Q' : RandObstacle->remove(); 
-				   globalData.obstacles.pop_back(); 
-			  	   break;
-	    default:
-	           return false;
-	           break;
+	case 'r' : controller->setRandomAll(10.); break;
+	//case 'b' : controller->setRandomPhi(); break;
+	//case 'n' : controller->setRandomU(); break;
+	//case 'm' : controller->setRandomX(10.); break;
+	case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
+	case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
+	case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false,"",1000)); 
+	           std::cout<< "Track file: open " << std::endl; break;
+	case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
+	           std::cout<< "Track file: close " << std::endl; break;
+	case 's' : agent->setTrackOptions(TrackRobot(false, false, false, true)); 
+	           std::cout<< "drawing track line " << std::endl; break;
+	case 'S' : agent->stopTracking();
+	           std::cout<< "Stop tracking" << std::endl; break;
+	case 'q' : RandObstacle->spawn(); 
+		   globalData.obstacles.push_back( RandObstacle );
+		   break;
+	case 'Q' : RandObstacle->remove(); 
+	    	   globalData.obstacles.pop_back(); 
+	    	   break;
+	default:
+	       return false;
+	       break;
         }
     }
     return false;
