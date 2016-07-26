@@ -60,6 +60,7 @@ protected:
   double a; 
   double b;
   double stepsize; 
+  double eps; 
 
   int number_sensors;
   int number_motors;
