@@ -50,7 +50,7 @@ public:
   **		    TI: trench
   **		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU, maze};
-  Env env = NO;
+  Env env = maze;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -253,7 +253,12 @@ public:
 
 	setCameraMode( Static );        
 	//setCameraHomePos(Pos(-0.403611, 41.6779, 46.5942),  Pos(179.949, -51.1891, 0));
-	setCameraHomePos(Pos(0.0919222, 18.978, 33.1766),  Pos(179.697, -62.2167, 0));
+	//setCameraHomePos(Pos(0.0919222, 18.978, 33.1766),  Pos(179.697, -62.2167, 0));
+	//setCameraHomePos(Pos(0.063416, 0.374084, 42.2245),  Pos(-179.806, -90.2157, 0));
+	//setCameraHomePos(Pos(0.063416, 0.374084, 42.2245),  Pos(-179.806, -90.2157, 0));
+	//setCameraHomePos(Pos(0.063416, 0.374084, 42.2245),  Pos(-179.806, -90.2157, 0));
+	setCameraHomePos(Pos(0.063416, 0.374084, 42.2245),  Pos(-179.806, -90.2157, 0));
+
 	RobInitPos = Pos(0,0,0);
 	} break;
     case PG: {  //Pos( radius, width of wall, hight of wall), bool: has its own ground or not
