@@ -29,9 +29,10 @@ public:
   OdeAgent* agent;
   OdeRobot* robot;
   double friction;
-  bool track = false; 
+  bool track = true; 
   Pos RobInitPos;
   RandomObstacles* RandObstacle; 
+  bool twoSpheres = true;
 
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
@@ -50,7 +51,7 @@ public:
   **		    TI: trench
   **		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU, maze};
-  Env env = NO;
+  Env env = maze;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -175,15 +176,45 @@ public:
        global.configs.push_back( controller );
        global.configs.push_back( robot );
     }
+    if(twoSpheres == true){
+       SphereRobotConf sconf = SphereRobot::getDefaultConf();
+       sconf.diameter = 0.5;
+       sconf.motorpowerfactor = 120;
+       /** to change the substance/material of the robot. be careful: material influences the behaviour */
+       OdeHandle myHandle = odeHandle;    /** default: plastic with roughness= 0.8 */
+       //myHandle.substance.toMetal(0.5);   /** roughness [0.1,1], very hard, elastic, slip */
+       //myHandle.substance.toRubber(50);   /** hardness [5,50], high roughness, no slip, very elastic */
+       OdeRobot* robot2 = new SphereRobot( myHandle, osgHandle.changeColor(Color(0.,1.,1.)), sconf, 
+				"Sphere2", global.odeConfig, 0.4);
+       robot2->addSensor(std::make_shared<SpeedSensor>( 1, SpeedSensor::Translational ),Attachment(-1));
+       //robot->place(osg::Matrix::translate(0,0,20));
+       robot2->place(Pos(1,0,0));
+       STSPController* controller2 = new STSPController( global.odeConfig );
+
+       /** plotTypes=8 == Noise, Default == Controller */
+       One2OneWiring* wiring2 = new One2OneWiring( new WhiteNormalNoise() );  // new One2OneWiring( new ColorUniformNoise(1.) );
+
+       OdeAgent* agent2 = new OdeAgent( globalData );
+       agent2->init( controller2, robot2, wiring2 );
+       global.agents.push_back( agent2 );
+       global.configs.push_back( controller2 );
+       global.configs.push_back( robot2 );
+		TrackRobot* TrackOpt2 = new TrackRobot(false, false, false, true); 
+    	TrackOpt2->conf.displayTraceDur = 500; /** length of track line */
+    	TrackOpt2->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
+    	TrackOpt2->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
+		agent2->addTracking(0, *TrackOpt2, Color(0.,1.,1.));
+		agent2->setTrackOptions( *TrackOpt2 );
+    }
 
     /** tracking: ( trackPos, trackSpeed, trackOrientation, displayTrace, scene  = "char", interval ) */
     /** more options in selforg/utils/trackrobot.h */
     /** if 1 of the first 3 arguments  == true:  log file with values is created */
     if(track == true){
-	TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    	TrackOpt->conf.displayTraceDur = 5000; /** length of track line */
+		TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
+    	TrackOpt->conf.displayTraceDur = 500; /** length of track line */
     	TrackOpt->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
-	agent->setTrackOptions( *TrackOpt );
+		agent->setTrackOptions( *TrackOpt );
     }
   };
 
@@ -196,6 +227,11 @@ public:
           OdeRobot* robot = globalData.agents[0]->getRobot();
           Pos vel = robot->getMainPrimitive()->getAngularVel();
           robot->getMainPrimitive()->applyTorque(-vel*friction);
+		  if(twoSpheres==true){
+            OdeRobot* robot2 = globalData.agents[1]->getRobot();
+            Pos vel = robot2->getMainPrimitive()->getAngularVel();
+            robot2->getMainPrimitive()->applyTorque(-vel*friction);
+		  }
        }
     }
   }
