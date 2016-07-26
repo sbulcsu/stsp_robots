@@ -29,7 +29,7 @@ public:
   OdeAgent* agent;
   OdeRobot* robot;
   double friction;
-  bool track = false; 
+  bool track = true; 
   Pos RobInitPos;
   RandomObstacles* RandObstacle; 
 
@@ -50,7 +50,7 @@ public:
   **		    TI: trench
   **		    RU: 3 little trenchs  */
   enum Env { NO, PG, OP, HG, TB, PT, EL, ELF, PLA, TI, RU, maze};
-  Env env = maze;
+  Env env = NO;
 
   ThisSim(){ //for definitions see osg/base.h
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -181,8 +181,8 @@ public:
     /** if 1 of the first 3 arguments  == true:  log file with values is created */
     if(track == true){
 	TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    	TrackOpt->conf.displayTraceDur = 200; /** length of track line */
-    	TrackOpt->conf.displayTraceThickness = 0.01; /** thickness of track line, if 0 then it is a line */
+    	TrackOpt->conf.displayTraceDur = 5000; /** length of track line */
+    	TrackOpt->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
 	agent->setTrackOptions( *TrackOpt );
     }
   };
@@ -507,7 +507,7 @@ public:
 	//case 'm' : controller->setRandomX(10.); break;
 	case 'm' : robot->moveToPosition(Pos(0,0,2.25)); break;
 	case 'M' : robot->moveToPosition(Pos(20,0,10.25)); break;
-	case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false,"",1000)); 
+	case 't' : agent->setTrackOptions(TrackRobot(true, true, true, false,"",100)); 
 	           std::cout<< "Track file: open " << std::endl; break;
 	case 'T' : agent->setTrackOptions(TrackRobot(false, false, false, false)); 
 	           std::cout<< "Track file: close " << std::endl; break;
