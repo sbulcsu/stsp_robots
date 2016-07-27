@@ -32,7 +32,7 @@ public:
   bool track = true; 
   Pos RobInitPos;
   RandomObstacles* RandObstacle; 
-  bool twoSpheres = true;
+  bool twoSpheres = false;
 
   enum robotType {TypeBarrel, TypeSphere};
   robotType type= TypeSphere;
@@ -111,15 +111,15 @@ public:
 
     /****** RANDOM OBSTACLES ********/
     /** to enable online generation of random obstacles with certain characteristics */
-	//RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
-    //randConf.pose = osg::Matrix::translate(0,0,0);
-    //randConf.area = Pos(4,4,2);
-    //randConf.minSize = Pos(.4,.4,.4);
-    //randConf.maxSize = Pos(1.5,1.5,.8);
-    //randConf.minDensity = 1;
-    //randConf.maxDensity = 10;
-    //RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
-    ///** Generation an placing Objects */
+	RandomObstaclesConf randConf = RandomObstacles::getDefaultConf();  
+    randConf.pose = osg::Matrix::translate(0,0,0);
+    randConf.area = Pos(4,4,2);
+    randConf.minSize = Pos(.4,.4,.4);
+    randConf.maxSize = Pos(1.5,1.5,.8);
+    randConf.minDensity = 1;
+    randConf.maxDensity = 10;
+    RandObstacle = new RandomObstacles(odeHandle, osgHandle, randConf);
+    /** Generation an placing Objects */
     //int num_randObs = 7; 
     //for (int i=0; i< num_randObs; i++){
     //	RandObstacle->spawn(RandomObstacles::Box, RandomObstacles::Foam);
@@ -200,7 +200,7 @@ public:
        global.configs.push_back( controller2 );
        global.configs.push_back( robot2 );
 		TrackRobot* TrackOpt2 = new TrackRobot(false, false, false, true); 
-    	TrackOpt2->conf.displayTraceDur = 500; /** length of track line */
+    	TrackOpt2->conf.displayTraceDur = 200; /** length of track line */
     	TrackOpt2->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
     	TrackOpt2->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
 		agent2->addTracking(0, *TrackOpt2, Color(0.,1.,1.));
@@ -212,7 +212,7 @@ public:
     /** if 1 of the first 3 arguments  == true:  log file with values is created */
     if(track == true){
 		TrackRobot* TrackOpt = new TrackRobot(false, false, false, true); 
-    	TrackOpt->conf.displayTraceDur = 500; /** length of track line */
+    	TrackOpt->conf.displayTraceDur = 200; /** length of track line */
     	TrackOpt->conf.displayTraceThickness = 0.0; /** thickness of track line, if 0 then it is a line */
 		agent->setTrackOptions( *TrackOpt );
     }
